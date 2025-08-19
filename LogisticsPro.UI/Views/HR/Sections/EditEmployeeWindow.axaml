@@ -1,0 +1,199 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="650" d:DesignHeight="600"
+        x:Class="LogisticsPro.UI.Views.HR.Sections.EditEmployeeWindow"
+        Title="Edit Employee"
+        Width="650"
+        Height="600"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        CanResize="False"
+        Background="#F8F9FA">
+
+    <Window.Styles>
+        <!-- Include the styles -->
+        <StyleInclude Source="/Styles/EditAddEmployee.axaml"/>
+        
+        <!-- Additional window-specific styles -->
+        <Style Selector="TextBox">
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+        
+        <Style Selector="ComboBox">
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+        
+        <Style Selector="ComboBoxItem">
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+    </Window.Styles>
+
+    <Border Background="White"
+            Margin="20"
+            CornerRadius="8"
+            BoxShadow="0 4 20 0 #10000000"
+            Padding="30">
+        <StackPanel Spacing="20">
+            <!-- Header -->
+            <TextBlock Text="Edit Employee"
+                       FontSize="28"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       Foreground="#2C3E50"
+                       Margin="0,0,0,10"/>
+
+            <!-- Name Fields -->
+            <Grid ColumnDefinitions="*,20,*" RowDefinitions="Auto,Auto">
+                <TextBlock Grid.Row="0" Grid.Column="0" 
+                           Text="First Name" 
+                           Classes="field-label"/>
+                <TextBox Grid.Row="1" Grid.Column="0" 
+                         Text="{Binding FirstName}"
+                         x:Name="FirstNameTextBox"
+                         Classes="clean-input"
+                         Watermark="Enter first name"/>
+
+                <TextBlock Grid.Row="0" Grid.Column="2" 
+                           Text="Last Name" 
+                           Classes="field-label"/>
+                <TextBox Grid.Row="1" Grid.Column="2" 
+                         Text="{Binding LastName}"
+                         Classes="clean-input"
+                         Watermark="Enter last name"/>
+            </Grid>
+
+            <!-- Username and Password -->
+            <Grid ColumnDefinitions="*,20,*" RowDefinitions="Auto,Auto">
+                <TextBlock Grid.Row="0" Grid.Column="0" 
+                           Text="Username" 
+                           Classes="field-label"/>
+                <TextBox Grid.Row="1" Grid.Column="0" 
+                         Text="{Binding Username}"
+                         Classes="clean-input"
+                         IsReadOnly="True"
+                         Background="#F5F5F5"
+                         Watermark="Username (read-only)"/>
+
+                <TextBlock Grid.Row="0" Grid.Column="2" 
+                           Text="Password" 
+                           Classes="field-label"/>
+                <TextBox Grid.Row="1" Grid.Column="2" 
+                         Text="{Binding Password}"
+                         PasswordChar="●"
+                         Classes="clean-input"
+                         Watermark="Enter password"/>
+            </Grid>
+
+            <!-- Department and Role -->
+            <Grid ColumnDefinitions="*,20,*" RowDefinitions="Auto,Auto">
+                <TextBlock Grid.Row="0" Grid.Column="0" 
+                           Text="Department" 
+                           Classes="field-label"/>
+                <ComboBox Grid.Row="1" Grid.Column="0"
+                          ItemsSource="{Binding Departments}"
+                          SelectedItem="{Binding SelectedDepartment, Mode=TwoWay}"
+                          DisplayMemberBinding="{Binding Name}"
+                          Classes="clean-dropdown"
+                          HorizontalAlignment="Stretch">
+                    <ComboBox.Styles>
+                        <Style Selector="ComboBoxItem">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="Foreground" Value="#333"/>
+                            <Setter Property="Padding" Value="12,8"/>
+                            <Setter Property="MinHeight" Value="36"/>
+                        </Style>
+                        <Style Selector="ComboBoxItem:pointerover">
+                            <Setter Property="Background" Value="#F0F8FF"/>
+                            <Setter Property="Foreground" Value="#2C3E50"/>
+                        </Style>
+                        <Style Selector="ComboBoxItem:selected">
+                            <Setter Property="Background" Value="#3498DB"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Style>
+                    </ComboBox.Styles>
+                </ComboBox>
+
+                <TextBlock Grid.Row="0" Grid.Column="2" 
+                           Text="Role" 
+                           Classes="field-label"/>
+                <ComboBox Grid.Row="1" Grid.Column="2"
+                          ItemsSource="{Binding AvailableRoles}"
+                          SelectedItem="{Binding SelectedRole, Mode=TwoWay}"
+                          Classes="clean-dropdown"
+                          HorizontalAlignment="Stretch">
+                    <ComboBox.Styles>
+                        <Style Selector="ComboBoxItem">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="Foreground" Value="#333"/>
+                            <Setter Property="Padding" Value="12,8"/>
+                            <Setter Property="MinHeight" Value="36"/>
+                        </Style>
+                        <Style Selector="ComboBoxItem:pointerover">
+                            <Setter Property="Background" Value="#F0F8FF"/>
+                            <Setter Property="Foreground" Value="#2C3E50"/>
+                        </Style>
+                        <Style Selector="ComboBoxItem:selected">
+                            <Setter Property="Background" Value="#3498DB"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Style>
+                    </ComboBox.Styles>
+                </ComboBox>
+            </Grid>
+
+            <!-- Email and Phone -->
+            <Grid ColumnDefinitions="*,20,*" RowDefinitions="Auto,Auto">
+                <TextBlock Grid.Row="0" Grid.Column="0" 
+                           Text="Email" 
+                           Classes="field-label"/>
+                <TextBox Grid.Row="1" Grid.Column="0" 
+                         Text="{Binding Email}"
+                         Classes="clean-input"
+                         Watermark="Enter email address"/>
+
+                <TextBlock Grid.Row="0" Grid.Column="2" 
+                           Text="Phone" 
+                           Classes="field-label"/>
+                <TextBox Grid.Row="1" Grid.Column="2" 
+                         Text="{Binding Phone}"
+                         Classes="clean-input"
+                         Watermark="Enter phone number"/>
+            </Grid>
+
+            <!-- Error Message -->
+            <Border Background="#FFEBEE"
+                    BorderBrush="#E74C3C"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Padding="12"
+                    IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <TextBlock Text="{Binding ErrorMessage}"
+                           Foreground="#C62828"
+                           FontWeight="Medium"
+                           HorizontalAlignment="Center"/>
+            </Border>
+
+            <!-- Buttons -->
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        Spacing="20"
+                        Margin="0,20,0,0">
+                <Button x:Name="CancelButton"
+                        Content="Cancel"
+                        Width="140"
+                        Height="45"
+                        Background="#95A5A6"
+                        Foreground="White"
+                        BorderThickness="0"
+                        CornerRadius="4"
+                        FontWeight="SemiBold"/>
+                <Button x:Name="UpdateButton"
+                        Content="Update Employee"
+                        Width="140" 
+                        Height="45"
+                        Classes="primary-btn"/>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

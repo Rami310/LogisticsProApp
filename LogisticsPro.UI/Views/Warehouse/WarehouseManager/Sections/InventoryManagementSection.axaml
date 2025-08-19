@@ -1,0 +1,243 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:LogisticsPro.UI.ViewModels"
+             x:Class="LogisticsPro.UI.Views.Warehouse.WarehouseManager.Sections.InventoryManagementSection"
+             x:DataType="vm:WarehouseManagerDashboardViewModel">
+    
+    <UserControl.Styles>
+        <!-- Button Styles -->
+        <Style Selector="Button.primary-button">
+            <Setter Property="Background" Value="#3498DB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="12,6"/>
+        </Style>
+        
+        <Style Selector="Button.primary-button:pointerover">
+            <Setter Property="Background" Value="#2980B9"/>
+        </Style>
+
+        <Style Selector="Button.secondary-button">
+            <Setter Property="Background" Value="#95A5A6"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="12,6"/>
+        </Style>
+        
+        <Style Selector="Button.secondary-button:pointerover">
+            <Setter Property="Background" Value="#7F8C8D"/>
+        </Style>
+
+        <!-- Search TextBox with proper black text color -->
+        <Style Selector="TextBox.search-input">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+        
+        <Style Selector="TextBox.search-input:focus">
+            <Setter Property="BorderBrush" Value="#3498DB"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+        
+        <Style Selector="TextBox.search-input:pointerover">
+            <Setter Property="BorderBrush" Value="#3498DB"/>
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+
+        <!-- Enhanced DataGrid Styles for Smooth Resizing -->
+        <Style Selector="DataGrid">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CanUserReorderColumns" Value="True"/>
+            <Setter Property="CanUserResizeColumns" Value="True"/>
+            <Setter Property="CanUserSortColumns" Value="True"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+        </Style>
+        
+        <Style Selector="DataGridColumnHeader">
+            <Setter Property="Background" Value="#34495E"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Height" Value="45"/>
+            <Setter Property="Padding" Value="12,0"/>
+        </Style>
+        
+        <Style Selector="DataGridRow">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="MinHeight" Value="45"/>
+        </Style>
+        
+        <Style Selector="DataGridRow:pointerover">
+            <Setter Property="Background" Value="#F8F9FA"/>
+        </Style>
+        
+        <Style Selector="DataGridRow:selected">
+            <Setter Property="Background" Value="#3498DB"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        
+        <Style Selector="DataGridRow:selected TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+    </UserControl.Styles>
+    
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="20" Spacing="20">
+            <!-- Header -->
+            <StackPanel>
+                <TextBlock Text="Inventory Management" FontSize="24" FontWeight="Bold" Foreground="#2C3E50"/>
+                <TextBlock Text="View and manage all warehouse inventory items" Foreground="#7F8C8D" FontSize="16"/>
+            </StackPanel>
+            
+            <!-- Summary Cards -->
+            <Grid ColumnDefinitions="*,*,*" Height="120">
+                <Border Grid.Column="0" Background="#3498DB" CornerRadius="10" Margin="0,0,10,0">
+                    <StackPanel Margin="20" VerticalAlignment="Center">
+                        <TextBlock Text="Total Items" FontSize="16" Foreground="White" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding InventoryItems.Count, FallbackValue='0'}" 
+                                   FontSize="28" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="different products" FontSize="12" Foreground="#AED6F1"/>
+                    </StackPanel>
+                </Border>
+                
+                <Border Grid.Column="1" Background="#E74C3C" CornerRadius="10" Margin="5,0">
+                    <StackPanel Margin="20" VerticalAlignment="Center">
+                        <TextBlock Text="Low Stock Alert" FontSize="16" Foreground="White" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding LowStockItems.Count, FallbackValue='0'}" 
+                                   FontSize="28" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="need restocking" FontSize="12" Foreground="#F1C40F"/>
+                    </StackPanel>
+                </Border>
+                
+                <Border Grid.Column="2" Background="#EAB308" CornerRadius="10" Margin="10,0,0,0">
+                    <StackPanel Margin="20" VerticalAlignment="Center">
+                        <TextBlock Text="Pending Requests" FontSize="16" Foreground="White" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding PendingRequests.Count, FallbackValue='0'}" 
+                                   FontSize="28" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="awaiting approval" FontSize="12" Foreground="White"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+            
+            <!-- Search and Inventory Combined Section -->
+            <Border Background="White" BorderBrush="Black" BorderThickness="2" CornerRadius="8">
+                <StackPanel Margin="20" Spacing="20">
+                    
+                    <!-- Real-time Search Section -->
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Search Inventory" FontSize="18" FontWeight="Bold"/>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <!-- Real-time search TextBox -->
+                            <TextBox Grid.Column="0" 
+                                     Text="{Binding SearchText}" 
+                                     Watermark="Search by product name, SKU, category, or location..."
+                                     Classes="search-input"/>
+        
+                            <!-- Clear button -->
+                            <Button Grid.Column="1" 
+                                    Content="✕ Clear" 
+                                    Classes="clear-button-orange" 
+                                    Margin="10,0,0,0"
+                                    Height="35"
+                                    Width="80"
+                                    HorizontalContentAlignment="Center"
+                                    Command="{Binding ClearSearchCommand}"
+                                    ToolTip.Tip="Clear search"/>
+                        </Grid>
+    
+                        <!-- Search status indicator -->
+                        <TextBlock Text="{Binding InventoryItems.Count, StringFormat='Showing {0} items'}" 
+                                   FontSize="12"
+                                   Foreground="Black"
+                                   Margin="0,5,0,0"/>
+                    </StackPanel>
+                    
+                    <!-- Separator Line -->
+                    <Border Height="1" Background="Black" Margin="0,10"/>
+                    
+                    <!-- Inventory Table Section -->
+                    <StackPanel>
+                        <TextBlock Text="Current Inventory" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+                        
+                        <!-- DataGrid with better column widths -->
+                        <DataGrid ItemsSource="{Binding InventoryItems}"
+                                  AutoGenerateColumns="False" 
+                                  IsReadOnly="True"
+                                  GridLinesVisibility="Horizontal"
+                                  BorderThickness="2"
+                                  BorderBrush="Black"
+                                  ColumnWidth="*">
+                            <DataGrid.Columns>
+                                <!-- Product Name -->
+                                <DataGridTextColumn Header="Product Name" 
+                                                    Binding="{Binding Product.Name, FallbackValue='N/A'}" 
+                                                    Width="250"
+                                                    MinWidth="220"
+                                                    CanUserResize="True"/>
+    
+                                <!--SKU -->
+                                <DataGridTextColumn Header="SKU" 
+                                                    Binding="{Binding Product.SKU, FallbackValue='N/A'}" 
+                                                    Width="140"
+                                                    MinWidth="120"
+                                                    CanUserResize="True"/>
+    
+                                <!-- Category -->
+                                <DataGridTextColumn Header="Category" 
+                                                    Binding="{Binding Product.Category, FallbackValue='N/A'}" 
+                                                    Width="150"
+                                                    MinWidth="130"
+                                                    CanUserResize="True"/>
+    
+                                <!-- Location  -->
+                                <DataGridTextColumn Header="Location" 
+                                                    Binding="{Binding Location, FallbackValue='N/A'}" 
+                                                    Width="120"
+                                                    MinWidth="110"
+                                                    CanUserResize="True"/>
+    
+                                <!-- Current Stock -->
+                                <DataGridTextColumn Header="Current Stock" 
+                                                    Binding="{Binding QuantityInStock, FallbackValue='0'}" 
+                                                    Width="140"
+                                                    MinWidth="130"
+                                                    CanUserResize="True"/>
+    
+                                <!-- Min Level -->
+                                <DataGridTextColumn Header="Min Level" 
+                                                    Binding="{Binding MinimumStockLevel, FallbackValue='0'}" 
+                                                    Width="*"
+                                                    MinWidth="110"
+                                                    CanUserResize="True"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+            
+            <!-- Loading Indicator -->
+            <Grid Background="#80FFFFFF" 
+                  IsVisible="{Binding IsLoading, FallbackValue='false'}"
+                  Height="100">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <ProgressBar IsIndeterminate="True" Width="200" Height="4"/>
+                    <TextBlock Text="Loading inventory data..." Margin="0,10,0,0" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

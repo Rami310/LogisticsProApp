@@ -1,0 +1,188 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:LogisticsPro.UI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="LogisticsPro.UI.Views.Warehouse.WarehouseEmployee.WarehouseEmployeeContentView"
+             x:DataType="vm:WarehouseEmployeeDashboardViewModel">
+    
+    <Grid>
+        <!-- Dashboard Content -->
+        <ScrollViewer IsVisible="{Binding CurrentSectionView, Converter={x:Static ObjectConverters.IsNull}}"
+                      HorizontalScrollBarVisibility="Disabled" 
+                      VerticalScrollBarVisibility="Auto">
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto" Background="#F8FAFC">
+                
+                <!-- 1. Welcome Section (consistent with manager) -->
+                <Border Grid.Row="0" Background="white" Padding="25,15,25,15">
+                    <TextBlock Text="{Binding WelcomeMessage, FallbackValue='Welcome to Warehouse Employee Dashboard!'}"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               Foreground="#1E293B" />
+                </Border>
+                
+                <!-- 2. KPI Cards (Half Width + All White Text) -->
+                <Grid Grid.Row="1" ColumnDefinitions="*,*" Height="80" Margin="20,20,20,0">
+                    <!-- Pending Approvals Card (Orange/Yellow) -->
+                    <Border Grid.Column="0" Background="#F59E0B" CornerRadius="8" Margin="0,0,10,0">
+                        <StackPanel Margin="15" VerticalAlignment="Center">
+                            <TextBlock Text="⏳ Pending Approvals" FontSize="14" Foreground="White" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding PendingApprovals.Count}" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,2,0,0"/>
+                            <TextBlock Text="manager orders need approval" FontSize="10" Foreground="White"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- My Decisions Card (Blue) -->
+                    <Border Grid.Column="1" Background="#3B82F6" CornerRadius="8" Margin="10,0,0,0">
+                        <StackPanel Margin="15" VerticalAlignment="Center">
+                            <TextBlock Text="✅ My Decisions" FontSize="14" Foreground="White" FontWeight="SemiBold"/>
+                            <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center" Margin="0,2,0,0">
+                                <TextBlock Text="{Binding ApprovedHistory.Count}" FontSize="24" FontWeight="Bold" Foreground="White"/>
+                                <TextBlock Text="/" FontSize="18" Foreground="White" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding RejectedHistory.Count}" FontSize="24" FontWeight="Bold" Foreground="White"/>
+                            </StackPanel>
+                            <TextBlock Text="approved/rejected this month" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+                
+                <!-- 3. Recent Activity Summary (Last 4 Orders Each Side) -->
+                <StackPanel Grid.Row="2" Margin="20,35,20,10">
+                    <TextBlock Text="📊 Recent Activity Summary" FontSize="18" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,15"/>
+                    
+                    <Grid ColumnDefinitions="*,*">
+                        <!-- Recent Approvals (Left) -->
+                        <Border Grid.Column="0" Background="White" BorderBrush="#10B981" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="✅ Recent Approvals" FontWeight="Bold" FontSize="16" Foreground="#10B981" Margin="0,0,0,15"/>
+                                
+                                <!-- Last 4 Approved Orders -->
+                                <ItemsControl ItemsSource="{Binding RecentApprovedOrders}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#F0FDF4" BorderBrush="#BBF7D0" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,5">
+                                                <Grid ColumnDefinitions="*,Auto">
+                                                    <StackPanel Grid.Column="0">
+                                                        <TextBlock Text="{Binding Product.Name}" FontWeight="SemiBold" FontSize="12" Foreground="#166534"/>
+                                                        <TextBlock Text="{Binding RequestedQuantity, StringFormat='Qty: {0}'}" FontSize="10" Foreground="#15803D"/>
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Column="1" Text="{Binding TotalCost, StringFormat='${0:F0}'}" FontSize="11" FontWeight="Bold" Foreground="#16A34A" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                
+                                <!-- No data message -->
+                                <TextBlock Text="No recent approvals" 
+                                          FontStyle="Italic" 
+                                          Foreground="#6B7280" 
+                                          FontSize="12"
+                                          HorizontalAlignment="Center"
+                                          Margin="0,20,0,0"
+                                          IsVisible="{Binding !RecentApprovedOrders.Count}"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <!-- Recent Rejections (Right) -->
+                        <Border Grid.Column="1" Background="White" BorderBrush="#EF4444" BorderThickness="1" CornerRadius="8" Padding="15" Margin="10,0,0,0">
+                            <StackPanel>
+                                <TextBlock Text="❌ Recent Rejections" FontWeight="Bold" FontSize="16" Foreground="#EF4444" Margin="0,0,0,15"/>
+                                
+                                <!-- Last 4 Rejected Orders -->
+                                <ItemsControl ItemsSource="{Binding RecentRejectedOrders}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#FEF2F2" BorderBrush="#FECACA" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,5">
+                                                <Grid ColumnDefinitions="*,Auto">
+                                                    <StackPanel Grid.Column="0">
+                                                        <TextBlock Text="{Binding Product.Name}" FontWeight="SemiBold" FontSize="12" Foreground="#991B1B"/>
+                                                        <TextBlock Text="{Binding RequestedQuantity, StringFormat='Qty: {0}'}" FontSize="10" Foreground="#B91C1C"/>
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Column="1" Text="{Binding TotalCost, StringFormat='${0:F0}'}" FontSize="11" FontWeight="Bold" Foreground="#DC2626" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                
+                                <!-- No data message -->
+                                <TextBlock Text="No recent rejections" 
+                                          FontStyle="Italic" 
+                                          Foreground="#6B7280" 
+                                          FontSize="12"
+                                          HorizontalAlignment="Center"
+                                          Margin="0,20,0,0"
+                                          IsVisible="{Binding !RecentRejectedOrders.Count}"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+                
+                <!-- 4. Quick Actions Section (Half Width + Closer to Bottom) -->
+                <StackPanel Grid.Row="3" Margin="20,35,20,20">
+                    <TextBlock Text="⚡ Quick Actions" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,15"/>
+                    
+                    <!-- Half Width Container -->
+                    <Grid ColumnDefinitions="*,*">
+                        <!-- Action Card (Half Width) -->
+                        <Border Grid.Column="0" CornerRadius="12" Height="100" Margin="0,0,10,0">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="#1E3A8A" Offset="0"/>
+                                <GradientStop Color="#1D4ED8" Offset="0.5"/>
+                                <GradientStop Color="#2563EB" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        
+                        <Button Background="Transparent" 
+                                BorderThickness="0" 
+                                Command="{Binding NavigateToSectionCommand}" 
+                                CommandParameter="Receiving"
+                                HorizontalContentAlignment="Stretch" 
+                                VerticalContentAlignment="Stretch"
+                                CornerRadius="12">
+                            <Grid ColumnDefinitions="Auto,*">
+                                <!-- Icon -->
+                                <Border Grid.Column="0" 
+                                        Background="Gold" 
+                                        CornerRadius="10" 
+                                        Width="65" 
+                                        Height="65" 
+                                        Margin="25,0,0,0">
+                                    <TextBlock Text="📋" 
+                                               FontSize="28" 
+                                               Foreground="White" 
+                                               FontWeight="Bold"
+                                               HorizontalAlignment="Center" 
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                
+                                <!-- Text Content -->
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="22,0,25,0">
+                                    <TextBlock Text="Review Pending Approvals" 
+                                               FontSize="18" 
+                                               Foreground="White" 
+                                               FontWeight="Bold"/>
+                                    <TextBlock Text="Approve or reject manager product requests" 
+                                               FontSize="13" 
+                                               Foreground="White" 
+                                               Margin="0,5,0,0"/>
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+                    </Border>
+                    <!-- Empty Second Column -->
+                    <Border Grid.Column="1" />
+                </Grid>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+        <!-- Section Content (Receiving, Activity Log, etc.) -->
+        <ContentControl Content="{Binding CurrentSectionView}"
+                        IsVisible="{Binding CurrentSectionView, Converter={x:Static ObjectConverters.IsNotNull}}"
+                        HorizontalContentAlignment="Stretch"
+                        VerticalContentAlignment="Stretch" />
+    </Grid>
+</UserControl>

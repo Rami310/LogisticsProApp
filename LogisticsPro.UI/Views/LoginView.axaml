@@ -1,0 +1,324 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             xmlns:vm="clr-namespace:LogisticsPro.UI.ViewModels"
+             x:Class="LogisticsPro.UI.Views.LoginView"
+             x:DataType="vm:LoginViewModel">
+    
+    <!-- Main container with responsive sizing -->
+    <Grid>
+        <!-- Left side decorative panel - desktop specific -->
+        <Border Width="350" HorizontalAlignment="Left" VerticalAlignment="Stretch">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                    <GradientStop Offset="0" Color="#3498DB" />
+                    <GradientStop Offset="1" Color="#27AE60" />
+                </LinearGradientBrush>
+            </Border.Background>
+
+            <!-- Professional Company Logo Section -->
+            <StackPanel VerticalAlignment="Center" Spacing="24">
+                <!-- Logo in elegant container -->
+                <Grid Width="180" Height="180" HorizontalAlignment="Center">
+                    <!-- Background glow effect -->
+                    <Ellipse Width="180" Height="180" Fill="#20FFFFFF" />
+
+                    <!-- Logo container with shadow -->
+                    <Border Width="160" Height="160"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            CornerRadius="80"
+                            ClipToBounds="True"
+                            Background="#3498DB"
+                            BorderBrush="#FFFFFF"
+                            BorderThickness="2">
+                        <Border.Effect>
+                            <DropShadowEffect OffsetX="0" OffsetY="5" BlurRadius="12" Color="#30000000" />
+                        </Border.Effect>
+
+                        <Grid>
+                            <!-- Optional subtle overlay for depth -->
+                            <Border CornerRadius="80"
+                                    Opacity="0.2">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Offset="0" Color="#FFFFFF" />
+                                        <GradientStop Offset="1" Color="Transparent" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                            </Border>
+
+                            <!-- Logo image with proper scaling -->
+                            <Image Source="/Assets/logistics pro text as a logo.jpg"
+                                   Stretch="UniformToFill"
+                                   Margin="-2" />
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- Company name with subtle shadow -->
+                <TextBlock Text="LogisticsPro"
+                           FontSize="32"
+                           FontWeight="Bold"
+                           Foreground="White"
+                           HorizontalAlignment="Center"
+                           Margin="0,5,0,0">
+                    <TextBlock.Effect>
+                        <DropShadowEffect OffsetX="0" OffsetY="1" BlurRadius="3" Color="#40000000" />
+                    </TextBlock.Effect>
+                </TextBlock>
+
+                <!-- Tagline with enhanced typography -->
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Streamline Your Supply Chain"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               Foreground="White"
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"
+                               Opacity="0.95" />
+
+                    <TextBlock Text="Login to access your dashboard"
+                               FontSize="14"
+                               Foreground="White"
+                               HorizontalAlignment="Center"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"
+                               Opacity="0.8"
+                               Margin="30,0" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Main content area -->
+        <Grid Margin="350,0,0,0">
+            <!-- Background with subtle gradient -->
+            <Rectangle>
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                        <GradientStop Offset="0" Color="#f8f9fa" />
+                        <GradientStop Offset="1" Color="#e9ecef" />
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+
+            <!-- Login form container -->
+            <Border MaxWidth="500"
+                    MinWidth="400"
+                    Margin="40"
+                    CornerRadius="8"
+                    BoxShadow="0 4 20 0 #20000000"
+                    Background="White"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+                <Grid RowDefinitions="Auto,*,Auto" Margin="40,30">
+                    <!-- Header -->
+                    <StackPanel Grid.Row="0" Spacing="10">
+                        <TextBlock Text="{Binding LoginTitle}"
+                                   FontSize="28" FontWeight="SemiBold"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,20,0,30"
+                                   Foreground="#212529" />
+                    </StackPanel>
+
+                    <!-- Form Content -->
+                    <StackPanel Grid.Row="1" Spacing="20" VerticalAlignment="Center" x:Name="MainPanel">
+                        <!-- Username field -->
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Username" FontSize="14" Foreground="#495057" />
+                            <TextBox Text="{Binding Username}"
+                                     Height="42"
+                                     CornerRadius="4"
+                                     Foreground="Black"
+                                     Classes="login-input">
+                                <TextBox.Styles>
+                                    <!-- Critical style to ensure text is visible -->
+                                    <Style Selector="TextBox /template/ TextBlock#PART_TextPresenter">
+                                        <Setter Property="Foreground" Value="Black"/>
+                                    </Style>
+                                </TextBox.Styles>
+                                <TextBox.Watermark>Enter your username</TextBox.Watermark>
+                            </TextBox>
+                        </StackPanel>
+
+                        <!-- Password field -->
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Password" FontSize="14" Foreground="#495057" />
+                            <TextBox Text="{Binding Password}"
+                                     PasswordChar="●"
+                                     Height="42"
+                                     CornerRadius="4"
+                                     Foreground="Black"
+                                     Classes="login-input">
+                                <TextBox.Styles>
+                                    <!-- Critical style to ensure password text is visible -->
+                                    <Style Selector="TextBox /template/ TextBlock#PART_TextPresenter">
+                                        <Setter Property="Foreground" Value="Black"/>
+                                    </Style>
+                                </TextBox.Styles>
+                                <TextBox.Watermark>Enter your password</TextBox.Watermark>
+                            </TextBox>
+                        </StackPanel>
+
+                        <!-- "Remember Me" checkbox -->
+                        <CheckBox Content="{Binding RememberMeText}"
+                                  IsChecked="{Binding RememberMe}"
+                                  Foreground="#495057"
+                                  Classes="remember-me"
+                                  Margin="0,5,0,5" />
+
+                        <!-- Error Message with Multiple Visibility Triggers -->
+                        <Border IsVisible="{Binding HasError}"
+                                Background="#FFEBEE"
+                                BorderBrush="#F44336"
+                                BorderThickness="2"
+                                CornerRadius="6"
+                                Padding="16,12"
+                                Margin="0,8,0,8">
+    
+                            <!-- Animation for smooth appearance -->
+                            <Border.Transitions>
+                                <Transitions>
+                                    <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+                                </Transitions>
+                            </Border.Transitions>
+    
+                            <Grid ColumnDefinitions="Auto,*">
+                                <!-- Warning Icon with explicit color -->
+                                <TextBlock Grid.Column="0"
+                                           Text="⚠️" 
+                                           FontSize="20"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,12,0" />
+        
+                                <!-- Error Text with multiple fallback strategies -->
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding ErrorMessageText}"
+                                           VerticalAlignment="Center"
+                                           TextWrapping="Wrap"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           LineHeight="20">
+            
+                                    <!-- Multiple explicit foreground setters -->
+                                    <TextBlock.Foreground>
+                                        <SolidColorBrush Color="#D32F2F" />
+                                    </TextBlock.Foreground>
+            
+                                    <!-- Template-level styling -->
+                                    <TextBlock.Styles>
+                                        <Style Selector="TextBlock">
+                                            <Setter Property="Foreground" Value="#D32F2F" />
+                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                        </Style>
+                                    </TextBlock.Styles>
+                                </TextBlock>
+                            </Grid>
+                        </Border>
+
+                        <!-- Login Button with Loading State -->
+                        <Button Command="{Binding LoginCommand}"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                Height="46"
+                                Padding="0"
+                                Margin="0,10"
+                                Classes="login-button"
+                                IsEnabled="{Binding !IsLoading}"
+                                CornerRadius="4"
+                                IsDefault="True">
+                            <Panel>
+                                <!-- Button text (visible when not loading) -->
+                                <TextBlock Text="{Binding LoginButtonText}"
+                                           IsVisible="{Binding !IsLoading}"
+                                           VerticalAlignment="Center" />
+
+                                <!-- Loading spinner (visible when loading) -->
+                                <ProgressBar IsIndeterminate="True"
+                                             Width="20" Height="20"
+                                             IsVisible="{Binding IsLoading}" />
+                            </Panel>
+                        </Button>
+
+                        <!-- Back to Welcome button -->
+                        <Button Content="{Binding BackToWelcomeText}"
+                                Command="{Binding NavigateToWelcomeCommand}"
+                                HorizontalAlignment="Center"
+                                Margin="0,20,0,0"
+                                Background="Transparent"
+                                Foreground="#3498DB"
+                                Classes="link-button"
+                                BorderThickness="0" />
+
+                        <!-- Clear Saved Credentials button (only show if RememberMe is checked) -->
+                        <Button Content="Clear Saved Login"
+                                Command="{Binding ClearSavedCredentialsCommand}"
+                                HorizontalAlignment="Center"
+                                Margin="0,5,0,0"
+                                Background="Transparent"
+                                Foreground="#DC3545"
+                                Classes="link-button"
+                                BorderThickness="0"
+                                FontSize="12"
+                                IsVisible="{Binding RememberMe}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+
+    <UserControl.Styles>
+        <!-- Input Fields Styling - Explicitly set text color -->
+        <Style Selector="TextBox.login-input">
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="#ced4da" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="Padding" Value="12,10" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+        </Style>
+
+        <!-- Style when TextBox has focus with black text -->
+        <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+            <Setter Property="BorderBrush" Value="#3498DB" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style Selector="TextBox:focus /template/ TextBlock#PART_TextPresenter">
+            <Setter Property="Foreground" Value="Black" />
+        </Style>
+
+        <!-- Login Button Styling -->
+        <Style Selector="Button.login-button">
+            <Setter Property="Background" Value="#3498DB" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <!-- Login Button Hover Effect -->
+        <Style Selector="Button.login-button:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#2980B9" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+
+        <!-- Link Button Styling -->
+        <Style Selector="Button.link-button:pointerover /template/ ContentPresenter">
+            <Setter Property="Foreground" Value="#2980B9" />
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+
+        <!-- Checkbox styling -->
+        <Style Selector="CheckBox.remember-me /template/ Border#NormalRectangle">
+            <Setter Property="BorderBrush" Value="#3498DB" />
+        </Style>
+        
+    </UserControl.Styles>
+    
+</UserControl>

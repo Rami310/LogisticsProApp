@@ -1,0 +1,305 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="LogisticsPro.UI.Views.Warehouse.WarehouseEmployee.Sections.ReceivingSection">
+    <Grid RowDefinitions="Auto,Auto,*" Margin="15">
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,15">
+            <TextBlock Text="Product Receiving" FontSize="28" FontWeight="Bold" Foreground="Black" Margin="0,0,0,8"/>
+            <TextBlock Text="Receive and document incoming products and shipments" FontSize="16" Foreground="Black" Margin="0,0,0,15"/>
+        </StackPanel>
+        
+        <!-- Dashboard Cards -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="0,0,0,20">
+            <!-- Pending Requests Card -->
+            <Border Grid.Column="0" Margin="0,0,10,0" CornerRadius="5" Background="White" BorderBrush="#3498DB" BorderThickness="1" Padding="15">
+                <StackPanel>
+                    <TextBlock Text="Pending Requests" FontSize="14" Foreground="Black"/>
+                    <TextBlock Text="{Binding PendingRequestsCount}" FontSize="24" FontWeight="Bold" Foreground="#3498DB" Margin="0,5,0,0"/>
+                    <TextBlock Text="Awaiting processing" FontSize="12" Foreground="Black" Margin="0,5,0,0"/>
+                </StackPanel>
+            </Border>
+            
+            <!-- Received Today Card -->
+            <Border Grid.Column="1" Margin="5,0" CornerRadius="5" Background="White" BorderBrush="#3498DB" BorderThickness="1" Padding="15">
+                <StackPanel>
+                    <TextBlock Text="Received Today" FontSize="14" Foreground="Black"/>
+                    <TextBlock Text="{Binding TodayApprovedCount}" FontSize="24" FontWeight="Bold" Foreground="#27AE60" Margin="0,5,0,0"/>
+                    <TextBlock Text="Successful deliveries" FontSize="12" Foreground="Black" Margin="0,5,0,0"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+        
+        <!-- Main Content Grid -->
+        <Grid Grid.Row="2" RowDefinitions="Auto,Auto,*">
+            
+            <!-- Filtering Options -->
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+                <TextBox Grid.Column="0" 
+                         Text="{Binding SearchText}" 
+                         Watermark="Search by product, SKU, or requester..." 
+                         Classes="search-box" 
+                         BorderThickness="2"
+                         BorderBrush="Black"
+                         Margin="0,0,10,0"/>
+                <Button Grid.Column="1" 
+                        Content="Refresh" 
+                        Command="{Binding RefreshDataCommand}"
+                        Width="100"
+                        Background="#2ECC71"
+                        Foreground="White"
+                        HorizontalContentAlignment="Center" />
+            </Grid>
+            
+            <!-- Pending Approvals Section -->
+            <StackPanel Grid.Row="1" Margin="0,10,0,20">
+                <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+                    <TextBlock Grid.Column="0" Text="⏳ Pending Manager Approvals" FontSize="18" FontWeight="Bold" Foreground="Black" />
+                </Grid>
+                
+                <!-- Pending Approvals DataGrid -->
+                <Border Background="White" 
+                        BorderBrush="#DFE6E9" 
+                        BorderThickness="1" 
+                        CornerRadius="5">
+                    <DataGrid ItemsSource="{Binding PendingApprovals}"
+                              IsReadOnly="True"
+                              AutoGenerateColumns="False"
+                              CanUserReorderColumns="True"
+                              CanUserResizeColumns="True"
+                              CanUserSortColumns="True"
+                              GridLinesVisibility="Horizontal"
+                              HeadersVisibility="Column"
+                              BorderThickness="0"
+                              Margin="0">
+                              
+                        <!-- Enhanced Column Headers -->
+                        <DataGrid.Styles>
+                            <Style Selector="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#374151"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                <Setter Property="Height" Value="42"/>
+                                <Setter Property="Padding" Value="12,0"/>
+                                <Setter Property="FontSize" Value="13"/>
+                            </Style>
+                            
+                            <Style Selector="DataGridRow">
+                                <Setter Property="Background" Value="White"/>
+                                <Setter Property="MinHeight" Value="40"/>
+                            </Style>
+                            
+                            <Style Selector="DataGridRow:pointerover">
+                                <Setter Property="Background" Value="#F9FAFB"/>
+                            </Style>
+                        </DataGrid.Styles>
+                              
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Product" 
+                                                Binding="{Binding Product.Name}" 
+                                                Width="220" 
+                                                MinWidth="180" />
+                            <DataGridTextColumn Header="SKU" 
+                                                Binding="{Binding Product.SKU}" 
+                                                Width="140" 
+                                                MinWidth="100" />
+                            <DataGridTextColumn Header="Requested By" 
+                                                Binding="{Binding RequestedBy}" 
+                                                Width="150" 
+                                                MinWidth="120" />
+                            <DataGridTextColumn Header="Quantity" 
+                                                Binding="{Binding RequestedQuantity}" 
+                                                Width="120" 
+                                                MinWidth="80" />
+                            <DataGridTextColumn Header="Total Cost" 
+                                                Binding="{Binding TotalCost, StringFormat='${0:F2}'}" 
+                                                Width="120" 
+                                                MinWidth="100" />
+                            <DataGridTextColumn Header="Request Date" 
+                                                Binding="{Binding RequestDate, StringFormat='{}{0:MM/dd/yyyy}'}" 
+                                                Width="140" 
+                                                MinWidth="100" />
+                            <DataGridTemplateColumn Header="Actions" 
+                                                    Width="140" 
+                                                    MinWidth="120">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Review Order" 
+                                                Command="{Binding DataContext.OpenApprovalDialogCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                CommandParameter="{Binding}"
+                                                Background="#3498DB"
+                                                Foreground="White"
+                                                Padding="8,4"
+                                                CornerRadius="4"
+                                                FontSize="12"
+                                                FontWeight="SemiBold"
+                                                BorderThickness="0"
+                                                Margin="2,0"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+            </StackPanel>
+        </Grid>
+        
+        <!-- Approval Dialog -->
+        <Border IsVisible="{Binding IsApprovalDialogOpen}"
+                Background="#80000000"
+                ZIndex="1000"
+                Grid.Row="0"
+                Grid.RowSpan="3"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Margin="-50,-50,-50,-50">
+            <Border Background="White"
+                    Width="600"
+                    MaxHeight="600"
+                    CornerRadius="5"
+                    BoxShadow="0 4 20 0 #20000000"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Padding="25">
+                <StackPanel Spacing="20">
+                    <!-- Header with X button in top-right -->
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Grid.Column="0" 
+                                   Text="📋 Review Manager Order" 
+                                   FontSize="22"
+                                   FontWeight="Bold"
+                                   Foreground="Black"
+                                   VerticalAlignment="Center" />
+                        
+                        <Button Grid.Column="1"
+                                Content="✕"
+                                Command="{Binding CloseApprovalDialogCommand}"
+                                Width="30"
+                                Height="30"
+                                FontSize="16"
+                                FontWeight="Bold"
+                                Background="Transparent"
+                                Foreground="#999999"
+                                BorderThickness="0"
+                                CornerRadius="15"
+                                HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center">
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover">
+                                    <Setter Property="Background" Value="#F0F0F0"/>
+                                    <Setter Property="Foreground" Value="#666666"/>
+                                </Style>
+                            </Button.Styles>
+                        </Button>
+                    </Grid>
+                              
+                    <!-- Product Details Grid -->
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto">
+                        <!-- Product Name -->
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Product:" FontWeight="SemiBold" Foreground="Black" Margin="0,0,0,10" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedRequest.Product.Name}" Foreground="Black" Margin="0,0,0,10" />
+                        
+                        <!-- Quantity -->
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Quantity:" FontWeight="SemiBold" Foreground="Black" Margin="0,0,0,10" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedRequest.RequestedQuantity}" Foreground="Black" Margin="0,0,0,10" />
+                        
+                        <!-- Total Cost -->
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Total Cost:" FontWeight="SemiBold" Foreground="Black" Margin="0,0,0,10" />
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedRequest.TotalCost, StringFormat='${0:F2}'}" FontWeight="Bold" Foreground="#E74C3C" Margin="0,0,0,10" />
+                        
+                        <!-- Requested By -->
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Requested By:" FontWeight="SemiBold" Foreground="Black" />
+                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedRequest.RequestedBy}" Foreground="Black" />
+                    </Grid>
+                    
+                    <!-- Manager's Notes -->
+                    <StackPanel Spacing="5">
+                        <TextBlock Text="Manager's Notes:" FontWeight="SemiBold" Foreground="Black" />
+                        <Border Background="#F8F9FA" BorderBrush="#E9ECEF" BorderThickness="1" CornerRadius="5" Padding="10">
+                            <TextBlock Text="{Binding SelectedRequest.Notes}" 
+                                       TextWrapping="Wrap"
+                                       Foreground="Black"
+                                       MinHeight="40" />
+                        </Border>
+                    </StackPanel>
+                    
+                    <!-- Employee Decision Notes -->
+                    <StackPanel Spacing="5">
+                        <TextBlock FontWeight="SemiBold" Foreground="Black">
+                            <TextBlock.Inlines>
+                                <Run Text="Your Decision Notes " />
+                                <Run Text="(Optional for approval, " Foreground="#27AE60" />
+                                <Run Text="Required for rejection)" Foreground="#E74C3C" />
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                        <TextBox Text="{Binding ApprovalNotes}"
+                                 Height="80"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 Watermark="Enter your approval/rejection notes here..." />
+                        
+                        <!-- Validation Message (Hidden by default) -->
+                        <Border IsVisible="{Binding ShowRejectionValidation}"
+                                Background="#FEF3C7" 
+                                BorderBrush="#F59E0B"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="10"
+                                Margin="0,5,0,0">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="⚠️" FontSize="14" VerticalAlignment="Center" Foreground="#FFC107"/> 
+                                <TextBlock Text="Please provide a reason for rejection before continuing."
+                                           FontSize="12"
+                                           Foreground="Black"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                    
+                    <!-- Action Buttons (No Cancel button) -->
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Spacing="20"
+                                Margin="0,15,0,0">
+                        <Button Content="✅ Approve Order"
+                                Command="{Binding ApproveRequestCommand}"
+                                Background="#27AE60"
+                                Foreground="White"
+                                Width="140"
+                                Height="40"
+                                FontWeight="Bold"
+                                HorizontalContentAlignment="Center" />
+                        <Button Content="❌ Reject Order"
+                                Command="{Binding RejectRequestCommand}"
+                                Background="#E74C3C"
+                                Foreground="White"
+                                Width="130"
+                                Height="40"
+                                FontWeight="Bold"
+                                HorizontalContentAlignment="Center" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+        
+        <!-- Loading Indicator -->
+        <Grid Background="#80FFFFFF" 
+              IsVisible="{Binding IsLoading}"
+              ZIndex="1000"
+              Grid.Row="0"
+              Grid.RowSpan="3">
+            <StackPanel VerticalAlignment="Center" 
+                        HorizontalAlignment="Center">
+                <ProgressBar IsIndeterminate="True" 
+                             Width="200" 
+                             Height="4" />
+                <TextBlock Text="Loading..." 
+                           Margin="0,10,0,0" 
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,0 +1,193 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:LogisticsPro.UI.ViewModels.Shared"
+             x:Class="LogisticsPro.UI.Views.Shared.RevenueSectionView"
+             x:DataType="vm:BaseRevenueViewModel">
+
+    <UserControl.Styles>
+        <!-- Card Styles -->
+        <Style Selector="Border.revenue-card">
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="BoxShadow" Value="0 1 3 0 #0F000000"/>
+            <Setter Property="Margin" Value="0,0,12,0"/>
+            <Setter Property="Height" Value="110"/>
+        </Style>
+        
+        <Style Selector="Border.revenue-card:pointerover">
+            <Setter Property="BoxShadow" Value="0 4 12 0 #1A000000"/>
+        </Style>
+
+        <!-- Progress Bar Styles -->
+        <Style Selector="ProgressBar.order-progress">
+            <Setter Property="Height" Value="6"/>
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="Background" Value="#F1F5F9"/>
+        </Style>
+        
+        <Style Selector="ProgressBar.budget-progress">
+            <Setter Property="Height" Value="6"/>
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="Background" Value="#F1F5F9"/>
+        </Style>
+    </UserControl.Styles>
+
+    <StackPanel Spacing="15">
+        
+        <!-- Header -->
+        <Grid ColumnDefinitions="Auto,*,Auto">
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10">
+                <TextBlock Text="💰" FontSize="18"/>
+                <TextBlock Text="{Binding UserRole, StringFormat='\{0\} Financial Overview'}" 
+                           FontSize="16" 
+                           FontWeight="SemiBold" 
+                           Foreground="#1E293B"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+            
+            <TextBlock Grid.Column="2" 
+                       Text="{Binding LastUpdated, StringFormat='Last updated: \{0:MMM dd, yyyy HH:mm\}', FallbackValue='Last updated: Aug 14, 2025 18:55'}" 
+                       FontSize="11" 
+                       Foreground="#64748B" 
+                       Margin="0,0,13,0"
+                       FontWeight="Medium"/>
+        </Grid>
+        
+        <!-- Revenue Cards Row -->
+        <Grid ColumnDefinitions="*,*,*">
+            
+            <!-- Available Budget Card -->
+            <Border Grid.Column="0" 
+                    Classes="revenue-card"
+                    Background="#10B981">
+                <StackPanel Margin="20" VerticalAlignment="Center">
+                    <TextBlock Text="Available Budget" 
+                               FontSize="13" 
+                               Foreground="White" 
+                               FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding AvailableBudget, StringFormat='\$\{0:N0\}', FallbackValue='$0'}" 
+                               FontSize="22" 
+                               FontWeight="Bold" 
+                               Foreground="White" 
+                               Margin="0,4,0,0"/>
+                    <TextBlock Text="Ready to spend" 
+                               FontSize="10" 
+                               Foreground="#86EFAC"/>
+                </StackPanel>
+            </Border>
+            
+            <!-- Total Spent Card -->
+            <Border Grid.Column="1" 
+                    Classes="revenue-card"
+                    Background="#EF4444">
+                <StackPanel Margin="20" VerticalAlignment="Center">
+                    <TextBlock Text="Total Spent" 
+                               FontSize="13" 
+                               Foreground="White" 
+                               FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding TotalSpent, StringFormat='\$\{0:N0\}', FallbackValue='$0'}" 
+                               FontSize="22" 
+                               FontWeight="Bold" 
+                               Foreground="White" 
+                               Margin="0,4,0,0"/>
+                    <TextBlock Text="All time spending" 
+                               FontSize="10" 
+                               Foreground="#FCA5A5"/>
+                </StackPanel>
+            </Border>
+            
+            <!-- This Month Card -->
+            <Border Grid.Column="2" 
+                    Classes="revenue-card"
+                    Background="#3B82F6">
+                <StackPanel Margin="20" VerticalAlignment="Center">
+                    <TextBlock Text="This Month" 
+                               FontSize="13" 
+                               Foreground="White" 
+                               FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding MonthlySpent, StringFormat='\$\{0:N0\}', FallbackValue='$0'}" 
+                               FontSize="22" 
+                               FontWeight="Bold" 
+                               Foreground="White" 
+                               Margin="0,4,0,0"/>
+                    <TextBlock Text="Monthly spending" 
+                               FontSize="10" 
+                               Foreground="#93C5FD"/>
+                </StackPanel>
+            </Border>
+            
+        </Grid>
+        
+        <!-- Progress Bars -->
+        <Grid ColumnDefinitions="*,20,*" Margin="0,30,0,0">
+            
+            <!-- Order Processing Progress -->
+            <Border Grid.Column="0" 
+                    Background="white" 
+                    BorderBrush="Black"
+                    BorderThickness="2"
+                    CornerRadius="8" 
+                    Padding="15">
+                <StackPanel Spacing="8">
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                        <TextBlock Grid.Column="0" 
+                                   Text="📋 Order Progress" 
+                                   FontSize="13" 
+                                   FontWeight="SemiBold" 
+                                   Foreground="#374151"/>
+                        <TextBlock Grid.Column="2" 
+                                   Text="{Binding OrderApprovalPercentage, StringFormat='\{0:F0\}%'}" 
+                                   FontSize="13" 
+                                   FontWeight="Bold" 
+                                   Foreground="{Binding OrderProgressColor}"/>
+                    </Grid>
+                    
+                    <!-- Progress Bar Colors -->
+                    <ProgressBar Classes="order-progress"
+                                 Value="{Binding OrderApprovalPercentage}"
+                                 Maximum="100"
+                                 BorderBrush="Black"
+                                 BorderThickness="1"
+                                 Foreground="#8B5CF6"/>
+                    
+                    <TextBlock Text="{Binding ApprovedOrdersText}" 
+                               FontSize="11" 
+                               Foreground="#6B7280"/>
+                </StackPanel>
+            </Border>
+            
+            <!-- Budget Utilization Progress -->
+            <Border Grid.Column="2" 
+                    Background="white" 
+                    BorderBrush="Black"
+                    BorderThickness="2"
+                    CornerRadius="8" 
+                    Padding="15">
+                <StackPanel Spacing="8">
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                        <TextBlock Grid.Column="0" 
+                                   Text="📊 Budget Utilization" 
+                                   FontSize="13" 
+                                   FontWeight="SemiBold" 
+                                   Foreground="#374151"/>
+                        <TextBlock Grid.Column="2" 
+                                   Text="{Binding BudgetUtilizationProgress, StringFormat='\{0:F0\}%'}" 
+                                   FontSize="13" 
+                                   FontWeight="Bold" 
+                                   Foreground="{Binding BudgetUtilizationColor}"/>
+                    </Grid>
+        
+                    <ProgressBar Classes="budget-progress"
+                                 Value="{Binding BudgetUtilizationProgress}"
+                                 Maximum="100"
+                                 BorderBrush="Black"
+                                 BorderThickness="1"
+                                 Foreground="#8B5CF6"/>
+        
+                    <TextBlock Text="{Binding BudgetUtilizationText}" 
+                               FontSize="11" 
+                               Foreground="#6B7280"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </StackPanel>
+</UserControl>

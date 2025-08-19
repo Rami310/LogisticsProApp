@@ -1,0 +1,309 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:LogisticsPro.UI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="LogisticsPro.UI.Views.HR.Sections.EmployeesSection"
+             x:DataType="vm:HRDashboardViewModel"
+             Background="White">
+
+    <UserControl.Styles>
+        <!-- Clean Input Style -->
+        <Style Selector="TextBox.clean-input">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#DDD"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="MinHeight" Value="36"/>
+            <Setter Property="Foreground" Value="#333"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+        
+        <Style Selector="TextBox.clean-input:focus">
+            <Setter Property="BorderBrush" Value="#3498DB"/>
+            <Setter Property="BorderThickness" Value="2"/>
+        </Style>
+
+        <!-- Success Button Style -->
+        <Style Selector="Button.success-btn">
+            <Setter Property="Background" Value="#27AE60"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <Style Selector="Button.success-btn:pointerover">
+            <Setter Property="Background" Value="#229954"/>
+        </Style>
+
+        <!-- Pagination Button Style -->
+        <Style Selector="Button.page-btn">
+            <Setter Property="Background" Value="#F8F9FA"/>
+            <Setter Property="Foreground" Value="#495057"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#DEE2E6"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="MinWidth" Value="80"/>
+        </Style>
+
+        <Style Selector="Button.page-btn:pointerover">
+            <Setter Property="Background" Value="#E9ECEF"/>
+            <Setter Property="BorderBrush" Value="#3498DB"/>
+        </Style>
+
+        <Style Selector="Button.page-btn:disabled">
+            <Setter Property="Opacity" Value="0.5"/>
+        </Style>
+
+        <!-- DataGrid Styles for Smooth Resizing -->
+        <Style Selector="DataGrid">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CanUserReorderColumns" Value="True"/>
+            <Setter Property="CanUserResizeColumns" Value="True"/>
+            <Setter Property="CanUserSortColumns" Value="True"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+        </Style>
+        
+        <Style Selector="DataGridColumnHeader">
+            <Setter Property="Background" Value="#34495E"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Height" Value="45"/>
+            <Setter Property="Padding" Value="12,0"/>
+        </Style>
+        
+        <Style Selector="DataGridRow">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="MinHeight" Value="45"/>
+        </Style>
+        
+        <Style Selector="DataGridRow:pointerover">
+            <Setter Property="Background" Value="#F8F9FA"/>
+        </Style>
+        
+        <Style Selector="DataGridRow:selected">
+            <Setter Property="Background" Value="#3498DB"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        
+        <Style Selector="DataGridRow:selected TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+    </UserControl.Styles>
+
+    <StackPanel Margin="20" Background="White">
+        
+        <!-- Header -->
+        <TextBlock Text="Employee Management" 
+                   FontSize="24" 
+                   FontWeight="Bold" 
+                   Margin="0,0,0,20"
+                   Foreground="#2C3E50" />
+                   
+        <!-- Controls Row -->
+        <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,15">
+            <TextBox Grid.Column="0"
+                     Text="{Binding SearchText}"
+                     Watermark="Search employees by name, role, department..."
+                     Classes="clean-input"
+                     Height="40"/>
+
+            <Button x:Name="AddEmployeeButton"
+                    Grid.Column="1"
+                    Content="+ Add Employee"
+                    Classes="success-btn"
+                    Width="180"
+                    Margin="15,0,0,0"/>
+        </Grid>
+
+        <!-- Employee Table with Smooth Column Resizing -->
+        <Border Background="White"
+                BorderBrush="#DFE6E9"
+                BorderThickness="1"
+                CornerRadius="8"
+                Margin="0,0,0,15"
+                BoxShadow="0 2 10 0 #10000000">
+
+            <DataGrid x:Name="EmployeeDataGrid"
+                      ItemsSource="{Binding PaginatedEmployees}"
+                      SelectedItem="{Binding SelectedEmployee, Mode=TwoWay}"
+                      AutoGenerateColumns="False">
+                      
+                <DataGrid.Columns>
+                    <!-- Display Order ID -->
+                    <DataGridTextColumn Header="#" 
+                                        Binding="{Binding DisplayId}" 
+                                        Width="50"
+                                        MinWidth="40"
+                                        MaxWidth="60"
+                                        CanUserResize="False" />
+                    
+                    <!-- Names - Smooth resizing columns -->
+                    <DataGridTextColumn Header="First Name" 
+                                        Binding="{Binding Name}" 
+                                        Width="120"
+                                        MinWidth="80"
+                                        CanUserResize="True" />
+                    
+                    <DataGridTextColumn Header="Last Name" 
+                                        Binding="{Binding LastName}" 
+                                        Width="120"
+                                        MinWidth="80"
+                                        CanUserResize="True" />
+                    
+                    <!-- Username -->
+                    <DataGridTextColumn Header="Username" 
+                                        Binding="{Binding Username}" 
+                                        Width="110"
+                                        MinWidth="80"
+                                        CanUserResize="True" />
+                    
+                    <!-- Role -->
+                    <DataGridTextColumn Header="Role" 
+                                        Binding="{Binding Role}" 
+                                        Width="150"
+                                        MinWidth="100"
+                                        CanUserResize="True" />
+                    
+                    <!-- Department -->
+                    <DataGridTextColumn Header="Department" 
+                                        Binding="{Binding Department}" 
+                                        Width="130"
+                                        MinWidth="100"
+                                        CanUserResize="True" />
+                    
+                    <!-- Status -->
+                    <DataGridTextColumn Header="Status" 
+                                        Binding="{Binding Status}" 
+                                        Width="80"
+                                        MinWidth="60"
+                                        MaxWidth="100"
+                                        CanUserResize="True" />
+                    
+                    <!-- Actions -->
+                    <DataGridTemplateColumn Header="Actions" 
+                                            Width="140"
+                                            MinWidth="130"
+                                            CanUserResize="False">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" 
+                                            Spacing="8" 
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Margin="4">
+                                    <Button Content="Edit"
+                                            Background="#3498DB"
+                                            Foreground="White"
+                                            BorderThickness="0"
+                                            CornerRadius="3"
+                                            Padding="12,6"
+                                            FontSize="12"
+                                            FontWeight="SemiBold"
+                                            Command="{Binding DataContext.EditEmployeeCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                            CommandParameter="{Binding}">
+                                        <Button.Styles>
+                                            <Style Selector="Button:pointerover">
+                                                <Setter Property="Background" Value="#2980B9"/>
+                                            </Style>
+                                        </Button.Styles>
+                                    </Button>
+                                    
+                                    <Button Content="Delete"
+                                            Background="#E74C3C"
+                                            Foreground="White"
+                                            BorderThickness="0"
+                                            CornerRadius="3"
+                                            Padding="12,6"
+                                            FontSize="12"
+                                            FontWeight="SemiBold"
+                                            Command="{Binding DataContext.DeleteEmployeeCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                            CommandParameter="{Binding}">
+                                        <Button.Styles>
+                                            <Style Selector="Button:pointerover">
+                                                <Setter Property="Background" Value="#C0392B"/>
+                                            </Style>
+                                        </Button.Styles>
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <!-- Pagination Controls -->
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Spacing="10"
+                    Margin="0,15">
+            
+            <Button Content="◀ Previous" 
+                    Classes="page-btn"
+                    Command="{Binding PreviousPageCommand}"
+                    IsEnabled="{Binding CanGoPrevious}"/>
+                    
+            <Border Background="White"
+                    BorderBrush="#DDD"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Padding="15,8">
+                <TextBlock HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Foreground="#495057"
+                           FontWeight="Medium">
+                    <Run Text="Page"/>
+                    <Run Text="{Binding CurrentPage}"/>
+                    <Run Text="of"/>
+                    <Run Text="{Binding TotalPages}"/>
+                    <Run Text="•"/>
+                    <Run Text="{Binding FilteredEmployees.Count}"/>
+                    <Run Text="employees"/>
+                </TextBlock>
+            </Border>
+            
+            <Button Content="Next ▶" 
+                    Classes="page-btn"
+                    Command="{Binding NextPageCommand}"
+                    IsEnabled="{Binding CanGoNext}"/>
+        </StackPanel>
+        
+        <!-- Empty state -->
+        <Border Background="#F8F9FA"
+                BorderBrush="#E9ECEF"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="40"
+                HorizontalAlignment="Center"
+                Margin="0,20"
+                IsVisible="{Binding FilteredEmployees.Count, Converter={x:Static ObjectConverters.Equal}, ConverterParameter=0}">
+            <StackPanel Spacing="15" HorizontalAlignment="Center">
+                <TextBlock Text="👥" FontSize="48" HorizontalAlignment="Center" />
+                <TextBlock Text="No employees found"
+                           FontSize="18"
+                           FontWeight="SemiBold"
+                           Foreground="#495057"
+                           HorizontalAlignment="Center" />
+                <TextBlock Text="Try adjusting your search criteria or add your first employee"
+                           FontSize="14"
+                           Foreground="#6C757D"
+                           HorizontalAlignment="Center"
+                           TextWrapping="Wrap"/>
+                <Button Content="+ Add First Employee"
+                        Classes="success-btn"
+                        Command="{Binding ToggleAddEmployeeDialogCommand}"
+                        HorizontalAlignment="Center"
+                        Margin="0,10,0,0"/>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

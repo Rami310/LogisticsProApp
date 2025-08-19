@@ -1,0 +1,30 @@
+@LogisticsPro.API_HostAddress = https://localhost:7001
+
+### Health Check
+GET {{LogisticsPro.API_HostAddress}}/health
+Accept: application/json
+
+### Weather Forecast
+GET {{LogisticsPro.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+### Test Users Login
+POST {{LogisticsPro.API_HostAddress}}/api/Users/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "1234"
+}
+
+### Get All Users
+GET {{LogisticsPro.API_HostAddress}}/api/Users
+Accept: application/json
+
+### Get All Products
+GET {{LogisticsPro.API_HostAddress}}/api/Products
+Accept: application/json
+
+### Get All Inventory
+GET {{LogisticsPro.API_HostAddress}}/api/Inventory
+Accept: application/json

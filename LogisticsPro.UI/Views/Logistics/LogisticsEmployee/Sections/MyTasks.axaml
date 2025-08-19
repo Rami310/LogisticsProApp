@@ -1,0 +1,308 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:LogisticsPro.UI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="LogisticsPro.UI.Views.Logistics.LogisticsEmployee.Sections.MyTasks"
+             x:DataType="vm:LogisticsEmployeeDashboardViewModel">
+    
+    <Grid>
+        <!-- Main Tasks Section -->
+        <Border Background="White" BorderBrush="Black" BorderThickness="2" CornerRadius="12" Padding="25" Margin="20,20,20,40">
+            <StackPanel>
+                <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,20">
+                    <TextBlock Grid.Column="0" Text="My Tasks - Ready for Shipment Orders" FontSize="20" FontWeight="Bold" Foreground="Black"/>
+                    
+                    <Button Grid.Column="1" 
+                            Classes="secondary-button" 
+                            Height="36" 
+                            Width="100"
+                            Background="#2ECC71"
+                            Foreground="White"
+                            Command="{Binding RefreshDataCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="Refresh" FontSize="12" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+                
+                <!-- Loading indicator -->
+                <Border IsVisible="{Binding IsLoading}" 
+                        Background="#F8F9FA" 
+                        CornerRadius="8" 
+                        Padding="20" 
+                        Margin="0,0,0,20">
+                    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                        <TextBlock Text="⏳" FontSize="16"/>
+                        <TextBlock Text="Loading shipment tasks..." FontSize="14" Foreground="#6C757D"/>
+                    </StackPanel>
+                </Border>
+                
+                
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" 
+                              VerticalScrollBarVisibility="Disabled"
+                              Margin="0,0,0,20">
+                <!-- Data Grid -->
+                <DataGrid ItemsSource="{Binding PaginatedMyTasks}"
+                          AutoGenerateColumns="False" 
+                          IsReadOnly="False"
+                          CanUserReorderColumns="True"
+                          CanUserResizeColumns="True"
+                          CanUserSortColumns="True"
+                          GridLinesVisibility="Horizontal"
+                          BorderThickness="2"
+                          BorderBrush="Black"
+                          MinHeight="640"
+                          IsVisible="{Binding !IsLoading}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="#" 
+                                            Binding="{Binding DisplayId, FallbackValue='N/A'}" 
+                                            Width="60"/>
+                        <DataGridTextColumn Header="Product" 
+                                            Binding="{Binding Product.Name, FallbackValue='N/A'}" 
+                                            Width="200"/>
+                        <DataGridTextColumn Header="Quantity" 
+                                            Binding="{Binding RequestedQuantity, FallbackValue='0'}" 
+                                            Width="110"/>
+                        <DataGridTextColumn Header="Requested By" 
+                                            Binding="{Binding RequestedBy, FallbackValue='N/A'}" 
+                                            Width="140"/>
+                        <DataGridTextColumn Header="Order Date" 
+                                            Binding="{Binding RequestDate, StringFormat='MM-dd HH:mm', FallbackValue='N/A'}" 
+                                            Width="140"/>
+                        <DataGridTextColumn Header="Total Value" 
+                                            Binding="{Binding TotalCost, StringFormat='${0:F2}', FallbackValue='$0.00'}" 
+                                            Width="120"/>
+                        <DataGridTemplateColumn Header="Actions" Width="200">
+                            
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <!-- Single Review Order Button (like warehouse employee) -->
+                                    <Button Classes="primary-button"
+                                            Height="28"
+                                            Width="110"
+                                            FontSize="12"
+                                            HorizontalAlignment="Center"
+                                            Command="{Binding $parent[DataGrid].((vm:LogisticsEmployeeDashboardViewModel)DataContext).OpenDeliveryDialogCommand}"
+                                            CommandParameter="{Binding}">
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <TextBlock Text="Review Order" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+                </ScrollViewer>
+                
+                
+                <!-- Show entire pagination section only when multiple pages exist -->
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Spacing="15"
+                            Margin="0,20,0,0"
+                            IsVisible="{Binding ShowTaskPagination}">
+                            
+    
+                    <!-- Previous Button -->
+                    <Button Content="← Previous" 
+                            Background="#F3F4F6"
+                            Foreground="#374151"
+                            BorderThickness="1"
+                            BorderBrush="#D1D5DB"
+                            CornerRadius="6"
+                            Padding="12,8"
+                            FontWeight="Medium"
+                            Command="{Binding PreviousTaskPageCommand}"
+                            IsEnabled="{Binding CanGoTaskPrevious}"/>
+            
+                    <!-- Page Info - Always show -->
+                    <Border Background="White"
+                            BorderBrush="#D1D5DB"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="12,8">
+                        <TextBlock HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Foreground="#374151"
+                                   FontWeight="Medium"
+                                   FontSize="13">
+                            <Run Text="Page"/>
+                            <Run Text="{Binding CurrentTaskPage}"/>
+                            <Run Text="of"/>
+                            <Run Text="{Binding TotalTaskPages}"/>
+                            <Run Text="•"/>
+                            <Run Text="{Binding MyTasks.Count}"/>
+                            <Run Text="tasks"/>
+                        </TextBlock>
+                    </Border>
+    
+                    <!-- Next Button -->
+                    <Button Content="Next →" 
+                            Background="#F3F4F6"
+                            Foreground="#374151"
+                            BorderThickness="1"
+                            BorderBrush="#D1D5DB"
+                            CornerRadius="6"
+                            Padding="12,8"
+                            FontWeight="Medium"
+                            Command="{Binding NextTaskPageCommand}"
+                            IsEnabled="{Binding CanGoTaskNext}"/>
+                </StackPanel>
+                
+                <!-- Empty state -->
+                <Border IsVisible="{Binding PaginatedMyTasks.Count, Converter={x:Static ObjectConverters.Equal}, ConverterParameter=0}"
+                        Background="#F8F9FA" 
+                        CornerRadius="8" 
+                        Padding="40" 
+                        Margin="0,20,0,0">
+                    <StackPanel Spacing="10" HorizontalAlignment="Center">
+                        <TextBlock Text="🚚" FontSize="48" HorizontalAlignment="Center" Foreground="#ADB5BD"/>
+                        <TextBlock Text="No shipment orders ready" FontSize="16" FontWeight="SemiBold" Foreground="#6C757D" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Orders marked ready for shipment by the logistics manager will appear here" FontSize="14" Foreground="#ADB5BD" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Border>
+
+        <!-- Delivery Review Dialog (Matching Warehouse Employee Style) -->
+        <Border IsVisible="{Binding IsDeliveryDialogOpen}"
+                Background="#80000000"
+                ZIndex="1000"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Margin="-50,-50,-50,-50">
+            <Border Background="White"
+                    Width="600"
+                    MaxHeight="600"
+                    CornerRadius="5"
+                    BoxShadow="0 4 20 0 #20000000"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Padding="25">
+                <StackPanel Spacing="20">
+                    <!-- Header with X button in top-right -->
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Grid.Column="0" 
+                                   Text="📋 Review Delivery Order" 
+                                   FontSize="22"
+                                   FontWeight="Bold"
+                                   Foreground="Black"
+                                   VerticalAlignment="Center" />
+                        
+                        <Button Grid.Column="1"
+                                Content="✕"
+                                Command="{Binding CloseDeliveryDialogCommand}"
+                                Width="30"
+                                Height="30"
+                                FontSize="16"
+                                FontWeight="Bold"
+                                Background="Transparent"
+                                Foreground="#999999"
+                                BorderThickness="0"
+                                CornerRadius="15"
+                                HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center">
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover">
+                                    <Setter Property="Background" Value="#F0F0F0"/>
+                                    <Setter Property="Foreground" Value="#666666"/>
+                                </Style>
+                            </Button.Styles>
+                        </Button>
+                    </Grid>
+                              
+                    <!-- Product Details Grid -->
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto">
+                        <!-- Product Name -->
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Product:" FontWeight="SemiBold" Foreground="Black" Margin="0,0,0,10" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedOrder.Product.Name}" Foreground="Black" Margin="0,0,0,10" />
+                        
+                        <!-- Quantity -->
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Quantity:" FontWeight="SemiBold" Foreground="Black" Margin="0,0,0,10" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedOrder.RequestedQuantity}" Foreground="Black" Margin="0,0,0,10" />
+                        
+                        <!-- Total Cost -->
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Total Cost:" FontWeight="SemiBold" Foreground="Black" Margin="0,0,0,10" />
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedOrder.TotalCost, StringFormat='${0:F2}'}" FontWeight="Bold" Foreground="#E74C3C" Margin="0,0,0,10" />
+                        
+                        <!-- Requested By -->
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Requested By:" FontWeight="SemiBold" Foreground="Black" />
+                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedOrder.RequestedBy}" Foreground="Black" />
+                    </Grid>
+                    
+                    <!-- Manager's Notes -->
+                    <StackPanel Spacing="5">
+                        <TextBlock Text="Manager's Notes:" FontWeight="SemiBold" Foreground="Black" />
+                        <Border Background="#F8F9FA" BorderBrush="#E9ECEF" BorderThickness="1" CornerRadius="5" Padding="10">
+                            <TextBlock Text="{Binding SelectedOrder.Notes}" 
+                                       TextWrapping="Wrap"
+                                       Foreground="Black"
+                                       MinHeight="40" />
+                        </Border>
+                    </StackPanel>
+                    
+                    <!-- Employee Decision Notes -->
+                    <StackPanel Spacing="5">
+                        <TextBlock FontWeight="SemiBold" Foreground="Black">
+                            <TextBlock.Inlines>
+                                <Run Text="Your Decision Notes " />
+                                <Run Text="(Optional for confirmation, " Foreground="#27AE60" />
+                                <Run Text="Required for abort)" Foreground="#E74C3C" />
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                        <TextBox Text="{Binding DeliveryNotes}"
+                                 Height="80"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 Foreground="Black"
+                                 Watermark="Enter your delivery confirmation/abort notes here..." />
+                        
+                        <!-- Validation Message (Hidden by default) -->
+                        <Border IsVisible="{Binding ShowAbortValidation}"
+                                Background="#FEF3C7" 
+                                BorderBrush="#F59E0B"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="10"
+                                Margin="0,5,0,0">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="⚠️" FontSize="14" VerticalAlignment="Center" Foreground="#FFC107"/> 
+                                <TextBlock Text="Please provide a reason for aborting this delivery before continuing."
+                                           FontSize="12"
+                                           Foreground="Black"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                    
+                    <!-- Action Buttons (Matching Warehouse Style) -->
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Spacing="20"
+                                Margin="0,15,0,0">
+                        <Button Content="✅ Confirm Delivery"
+                                Command="{Binding ConfirmDeliveryFromDialogCommand}"
+                                Background="#27AE60"
+                                Foreground="White"
+                                Width="165"
+                                Height="40"
+                                FontWeight="Bold"
+                                HorizontalContentAlignment="Center" />
+                        <Button Content="🚫 Abort Delivery"
+                                Command="{Binding AbortDeliveryFromDialogCommand}"
+                                Background="#E74C3C"
+                                Foreground="White"
+                                Width="160"
+                                Height="40"
+                                FontWeight="Bold"
+                                HorizontalContentAlignment="Center" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</UserControl>

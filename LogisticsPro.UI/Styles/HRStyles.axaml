@@ -1,0 +1,80 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- HR Section specific styles that aren't covered in the main AppStyles -->
+    
+    <!-- Employee grid styling -->
+    <Style Selector="Grid.employee-grid">
+        <Setter Property="Margin" Value="0,10"/>
+    </Style>
+    
+    <!-- Department card style -->
+    <Style Selector="Border.department-card">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderBrush" Value="#e6e6e6"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="5"/>
+        <Setter Property="Margin" Value="0,0,0,10"/>
+        <Setter Property="Padding" Value="15"/>
+    </Style>
+    
+    <!-- HR Form label style -->
+    <Style Selector="TextBlock.form-label">
+        <Setter Property="Margin" Value="0,0,0,5"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Foreground" Value="#495057"/>
+    </Style>
+    
+    <!-- HR Dialog backdrop style -->
+    <Style Selector="Panel.dialog-backdrop">
+        <Setter Property="Background" Value="#80000000"/>
+        <Setter Property="ZIndex" Value="1000"/>
+    </Style>
+    
+    <!-- HR Dialog container style -->
+    <Style Selector="Border.dialog-container">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="CornerRadius" Value="5"/>
+        <Setter Property="BoxShadow" Value="0 4 20 0 #20000000"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Padding" Value="25"/>
+        <Setter Property="Width" Value="550"/>
+        <Setter Property="MaxWidth" Value="800"/>
+    </Style>
+    
+    <!-- HR Dialog title style -->
+    <Style Selector="TextBlock.dialog-title">
+        <Setter Property="FontSize" Value="24"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0,0,0,15"/>
+    </Style>
+    
+    <!-- Form row styling -->
+    <Style Selector="Grid.form-row">
+        <Setter Property="Margin" Value="0,10,0,5"/>
+    </Style>
+    
+    <!-- Form field column style -->
+    <Style Selector="StackPanel.form-field">
+        <Setter Property="Spacing" Value="5"/>
+        <Setter Property="Margin" Value="0,0,10,0"/>
+    </Style>
+    
+    <!-- HR ComboBox style -->
+    <Style Selector="ComboBox.hr-dropdown">
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="Height" Value="42"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="BorderBrush" Value="#ced4da"/>
+    </Style>
+    
+    <!-- HR Button row style -->
+    <Style Selector="StackPanel.button-row">
+        <Setter Property="Orientation" Value="Horizontal"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="Spacing" Value="15"/>
+        <Setter Property="Margin" Value="0,15,0,0"/>
+    </Style>
+</Styles>

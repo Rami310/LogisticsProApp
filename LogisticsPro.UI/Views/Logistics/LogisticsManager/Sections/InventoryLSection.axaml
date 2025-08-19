@@ -1,0 +1,211 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:LogisticsPro.UI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="LogisticsPro.UI.Views.Logistics.LogisticsManager.Sections.InventoryLSection"
+             x:DataType="vm:LogisticsManagerDashboardViewModel">
+    
+                    <!-- Product Requests Table -->
+                    <Border Background="White" BorderBrush="black" BorderThickness="2" CornerRadius="8" Padding="25" Margin="30,60,30,30"
+                            MaxWidth="1000" HorizontalAlignment="Center">
+                        <StackPanel>
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,20">
+                                <TextBlock Grid.Column="0" Text="📦 Inventory Management - Mark Items Ready for Shipment" FontSize="20" FontWeight="Bold" Foreground="#2C3E50"/>
+                                
+                                <Button Grid.Column="1" 
+                                        Classes="secondary-button" 
+                                        Height="36" 
+                                        Width="100"
+                                        Command="{Binding RefreshDataCommand}"
+                                        Background="#10B981"
+                                        Foreground="White"
+                                        BorderThickness="0"
+                                        CornerRadius="6"
+                                        FontWeight="SemiBold">
+                                    <TextBlock Text="Refresh" FontSize="13" FontWeight="SemiBold"/>
+                                </Button>
+                            </Grid>
+                            
+                            <!-- Loading indicator -->
+                            <Border IsVisible="{Binding IsLoading}" 
+                                    Background="#F8F9FA" 
+                                    CornerRadius="8" 
+                                    Padding="20" 
+                                    Margin="0,0,0,20">
+                                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                                    <TextBlock Text="⏳" FontSize="16"/>
+                                    <TextBlock Text="Loading inventory items..." FontSize="14" Foreground="#6C757D"/>
+                                </StackPanel>
+                            </Border>
+                            
+                            <!-- Data Grid -->
+                            <DataGrid ItemsSource="{Binding PaginatedRequests}"
+                                      AutoGenerateColumns="False" 
+                                      IsReadOnly="False"
+                                      GridLinesVisibility="Horizontal"
+                                      BorderThickness="2"
+                                      BorderBrush="Black"
+                                      MinHeight="400"
+                                      IsVisible="{Binding !IsLoading}"
+                                      CanUserReorderColumns="True"
+                                      CanUserResizeColumns="True"
+                                      CanUserSortColumns="True"> 
+                                
+                                <!-- Professional DataGrid Styling -->
+                                <DataGrid.Styles>
+                                    <Style Selector="DataGridColumnHeader">
+                                        <Setter Property="Background" Value="#374151"/>
+                                        <Setter Property="Foreground" Value="White"/>
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="Height" Value="42"/>
+                                        <Setter Property="Padding" Value="12,0"/>
+                                        <Setter Property="FontSize" Value="13"/>
+                                    </Style>
+                                    
+                                    <Style Selector="DataGridRow">
+                                        <Setter Property="Background" Value="White"/>
+                                        <Setter Property="MinHeight" Value="40"/>
+                                    </Style>
+                                    
+                                    <Style Selector="DataGridRow:pointerover">
+                                        <Setter Property="Background" Value="#F9FAFB"/>
+                                    </Style>
+                                </DataGrid.Styles>
+                                
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="#" 
+                                                        Binding="{Binding UIId}"
+                                                        Width="70"/>
+                                    <DataGridTextColumn Header="Product" 
+                                                        Binding="{Binding Product, FallbackValue='-'}" 
+                                                        Width="200"/>
+                                    <DataGridTextColumn Header="Quantity" 
+                                                        Binding="{Binding RequestedQuantity, FallbackValue='0'}" 
+                                                        Width="115"/>
+                                    <DataGridTextColumn Header="Requested By" 
+                                                        Binding="{Binding RequestedBy, FallbackValue='-'}" 
+                                                        Width="150"/>
+                                    <DataGridTextColumn Header="Request Date" 
+                                                        Binding="{Binding RequestDate, StringFormat='MM-dd HH:mm', FallbackValue='-'}" 
+                                                        Width="145"/>
+                                    <DataGridTextColumn Header="Total Cost" 
+                                                        Binding="{Binding TotalCost, StringFormat='${0:F2}', FallbackValue='$0.00'}" 
+                                                        Width="130"/>
+                                    <DataGridTemplateColumn Header="Actions" Width="130">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal"
+                                                            HorizontalAlignment="Center"
+                                                            VerticalAlignment="Center"
+                                                            Spacing="8"
+                                                            Margin="0,8,0,8">
+                                                    
+                                                    <!-- Mark Ready Button (for Approved items) -->
+                                                    <Button Content="Mark as Ready" 
+                                                            Background="LightSeaGreen"
+                                                            Foreground="White"
+                                                            BorderThickness="0"
+                                                            CornerRadius="4"
+                                                            FontSize="11"
+                                                            FontWeight="SemiBold"
+                                                            Padding="8,4"
+                                                            Height="28"
+                                                            Command="{Binding $parent[UserControl].((vm:LogisticsManagerDashboardViewModel)DataContext).MarkReadyForShipmentCommand}"
+                                                            CommandParameter="{Binding Request}"
+                                                            IsVisible="{Binding IsApproved}"
+                                                            ToolTip.Tip="Mark this item as ready for shipment"/>
+                                                    
+                                                    <!-- Cancel Ready Button (for Ready items) -->
+                                                    <Button Content="Cancel Ready" 
+                                                            Background="#EF4444"
+                                                            Foreground="White"
+                                                            BorderThickness="0"
+                                                            CornerRadius="4"
+                                                            FontSize="11"
+                                                            FontWeight="SemiBold"
+                                                            Padding="8,4"
+                                                            Height="28"
+                                                            Command="{Binding $parent[UserControl].((vm:LogisticsManagerDashboardViewModel)DataContext).CancelReadyForShipmentCommand}"
+                                                            CommandParameter="{Binding Request}"
+                                                            IsVisible="{Binding IsReadyForShipment}"
+                                                            ToolTip.Tip="Cancel shipment readiness"/>
+                                                    
+                                                    <!-- Status indicator for other statuses -->
+                                                    <TextBlock Text="—" 
+                                                               VerticalAlignment="Center" 
+                                                               HorizontalAlignment="Center"
+                                                               FontSize="14"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="#9CA3AF"
+                                                               IsVisible="{Binding IsNotActionable}"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <!-- Add Pagination Controls (matching InventoryLSection style) -->
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Center"
+                                        Spacing="10"
+                                        Margin="0,15,0,0">
+    
+                                <Button Content="← Previous" 
+                                        Background="#F3F4F6"
+                                        Foreground="#374151"
+                                        BorderThickness="1"
+                                        BorderBrush="#D1D5DB"
+                                        CornerRadius="6"
+                                        Padding="12,8"
+                                        FontWeight="Medium"
+                                        Command="{Binding GoToPreviousPageCommand}"/>
+            
+                                <Border Background="White"
+                                        BorderBrush="#D1D5DB"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Padding="12,8">
+                                    <TextBlock HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Foreground="#374151"
+                                               FontWeight="Medium"
+                                               FontSize="13">
+                                        <Run Text="Page"/>
+                                        <Run Text="{Binding CurrentPage}"/>
+                                        <Run Text="of"/>
+                                        <Run Text="{Binding TotalPages}"/>
+                                        <Run Text="•"/>
+                                        <Run Text="{Binding ProductRequestsWithIds.Count}"/>
+                                        <Run Text="requests"/>
+                                    </TextBlock>
+                                </Border>
+    
+                                <Button Content="Next →" 
+                                        Background="#F3F4F6"
+                                        Foreground="#374151"
+                                        BorderThickness="1"
+                                        BorderBrush="#D1D5DB"
+                                        CornerRadius="6"
+                                        Padding="12,8"
+                                        FontWeight="Medium"
+                                        Command="{Binding GoToNextPageCommand}"/>
+                            </StackPanel>
+                            
+                            <!-- Empty state -->
+                            <Border IsVisible="{Binding PaginatedRequests.Count, Converter={x:Static ObjectConverters.Equal}, ConverterParameter=0}"
+                                    Background="#F8F9FA" 
+                                    CornerRadius="8" 
+                                    Padding="40" 
+                                    Margin="0,20,0,0">
+                                <StackPanel Spacing="10" HorizontalAlignment="Center">
+                                    <TextBlock Text="📦" FontSize="48" HorizontalAlignment="Center" Foreground="#ADB5BD"/>
+                                    <TextBlock Text="No inventory items found" FontSize="16" FontWeight="SemiBold" Foreground="#6C757D" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Approved inventory items will appear here for shipment management" FontSize="14" Foreground="#ADB5BD" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+</UserControl>

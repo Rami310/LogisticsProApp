@@ -1,0 +1,13 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:shared="clr-namespace:LogisticsPro.UI.Views.Shared"
+             xmlns:vm="clr-namespace:LogisticsPro.UI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="600"
+             x:Class="LogisticsPro.UI.Views.Warehouse.WarehouseEmployee.WarehouseEmployeeDashboardView"
+             x:DataType="vm:WarehouseEmployeeDashboardViewModel">
+
+    <shared:DashboardLayout x:Name="Layout"/>
+    
+</UserControl>

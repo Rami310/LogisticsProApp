@@ -1,0 +1,75 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <AvaloniaUseCompiledBindings>true</AvaloniaUseCompiledBindings>
+        <Nullable>enable</Nullable>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\**"/>
+        <AvaloniaXaml Remove="Styles\AppStyles.axaml" />
+        <AvaloniaResource Include="Styles\AppStyles.axaml" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.2.1"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.2.1"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.1"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.1"/>
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.2.1">
+            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1"/>
+        <PackageReference Include="MessageBox.Avalonia" Version="3.1.5.1" />
+    </ItemGroup>
+
+    <!-- Compile Update entries for XAML code-behind files -->
+    <ItemGroup>
+        <Compile Update="Views\LoginView.axaml.cs">
+            <DependentUpon>LoginView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\HR\Sections\AddEmployeeWindow.axaml.cs">
+            <DependentUpon>AddEmployeeWindow.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\Logistics\LogisticsEmployee\LogisticsEmployeeContentView.axaml.cs">
+            <DependentUpon>LogisticsEmployeeContentView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\Logistics\LogisticsEmployee\LogisticsEmployeeDashboardView.axaml.cs">
+            <DependentUpon>LogisticsEmployeeDashboardView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\Warehouse\WarehouseEmployee\WarehouseEmployeeContentView.axaml.cs">
+            <DependentUpon>WarehouseEmployeeContentView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\Warehouse\WarehouseEmployee\WarehouseEmployeeDashboardView.axaml.cs">
+            <DependentUpon>WarehouseEmployeeDashboardView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\Warehouse\WarehouseManager\WarehouseManagerContentView.axaml.cs">
+          <DependentUpon>WarehouseManagerContentView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\Warehouse\WarehouseManager\WarehouseManagerDashboardView.axaml.cs">
+          <DependentUpon>WarehouseManagerDashboardView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\Logistics\LogisticsManager\LogisticsManagerContentView.axaml.cs">
+          <DependentUpon>LogisticsManagerContentView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\Logistics\LogisticsManager\LogisticsManagerDashboardView.axaml.cs">
+          <DependentUpon>LogisticsManagerDashboardView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+    </ItemGroup>
+    
+</Project>

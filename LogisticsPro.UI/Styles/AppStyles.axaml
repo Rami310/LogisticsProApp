@@ -1,0 +1,345 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <!-- ======== TEXT INPUT CONTROLS ======== -->
+    <!-- Base TextBox style -->
+    <Style Selector="TextBox">
+        <Setter Property="Padding" Value="8,6"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="#ced4da"/>
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="CaretBrush" Value="#3498DB"/>
+        <Setter Property="SelectionBrush" Value="#a0c7e7"/>
+        <Setter Property="SelectionForegroundBrush" Value="Black"/>
+    </Style>
+    
+    <!-- Force TextBox text to be black -->
+    <Style Selector="TextBox /template/ TextBlock#PART_TextPresenter">
+        <Setter Property="Foreground" Value="Black"/>
+    </Style>
+    
+    <Style Selector="TextBox:pointerover /template/ TextBlock#PART_TextPresenter">
+        <Setter Property="Foreground" Value="Black"/>
+    </Style>
+    
+    <Style Selector="TextBox:focus /template/ TextBlock#PART_TextPresenter">
+        <Setter Property="Foreground" Value="Black"/>
+    </Style>
+    
+    <!-- TextBox states -->
+    <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="#3498DB"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Background" Value="White"/>
+    </Style>
+    
+    <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="#3498DB"/>
+        <Setter Property="Background" Value="White"/>
+    </Style>
+
+    <!-- Password TextBox fixes -->
+    <Style Selector="TextBox:password /template/ TextBlock#PART_TextPresenter">
+        <Setter Property="Foreground" Value="Black"/>
+    </Style>
+    
+    <Style Selector="TextBox:password:pointerover /template/ TextBlock#PART_TextPresenter">
+        <Setter Property="Foreground" Value="Black"/>
+    </Style>
+    
+    <Style Selector="TextBox:password:focus /template/ TextBlock#PART_TextPresenter">
+        <Setter Property="Foreground" Value="Black"/>
+    </Style>
+    
+    <!-- Search box style -->
+    <Style Selector="TextBox.search-box">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderBrush" Value="#ced4da"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="Margin" Value="0,0,10,0"/>
+        <Setter Property="Height" Value="36"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="Black"/>
+    </Style>
+    
+    <!-- Login/form input style -->
+    <Style Selector="TextBox.form-input">
+        <Setter Property="Height" Value="42"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="#ced4da"/>
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="Padding" Value="12,10"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="Foreground" Value="Black"/>
+    </Style>
+    
+    <Style Selector="ComboBox">
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderBrush" Value="#ced4da"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Padding" Value="8,6"/>
+    </Style>
+    
+    <Style Selector="ComboBox /template/ TextBlock">
+        <Setter Property="Foreground" Value="Black"/>
+    </Style>
+    
+    <Style Selector="ComboBoxItem">
+        <Setter Property="Foreground" Value="Black"/>
+    </Style>
+    
+    <Style Selector="ComboBox:pointerover /template/ Border#Background">
+        <Setter Property="Background" Value="White"/>
+    </Style>
+    
+    <Style Selector="ComboBox:focus /template/ Border#Background">
+        <Setter Property="Background" Value="White"/>
+    </Style>
+    
+    <Style Selector="ComboBox:pointerover /template/ Border#BorderElement">
+        <Setter Property="BorderBrush" Value="#3498DB"/>
+        <Setter Property="Background" Value="White"/>
+    </Style>
+    
+    <Style Selector="ComboBox:focus /template/ Border#BorderElement">
+        <Setter Property="BorderBrush" Value="#3498DB"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Background" Value="White"/>
+    </Style>
+    
+    <!-- ======== ERROR TEXT ======== -->
+    <Style Selector="TextBlock.error">
+        <Setter Property="Foreground" Value="#dc3545"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Margin" Value="0,5"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+    </Style>
+    
+    <!-- ======== BUTTONS ======== -->
+    <!-- Button animations -->
+    <Style Selector="Button:pressed">
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <ScaleTransform ScaleX="0.95" ScaleY="0.95"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <!-- Sidebar button style -->
+    <Style Selector="Button.sidebar-button">
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Padding" Value="15,10"/>
+        <Setter Property="Margin" Value="0,5"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Background" Value="#34495E"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Height" Value="42"/>
+        <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+
+    <!-- Active Navigation Button -->
+    <Style Selector="Button.active-nav">
+        <Setter Property="Background" Value="#3498DB"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+
+    <!-- Logout Button -->
+    <Style Selector="Button.logout-button">
+        <Setter Property="Background" Value="#E74C3C"/>
+    </Style>
+
+    <!-- Hover Effects for sidebar buttons -->
+    <Style Selector="Button.sidebar-button:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="#2C3E50"/>
+        <Setter Property="Opacity" Value="0.9"/>
+    </Style>
+    
+    <!-- Primary action button -->
+    <Style Selector="Button.primary-button">
+        <Setter Property="Background" Value="#3498DB"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    
+    <!-- Primary button hover -->
+    <Style Selector="Button.primary-button:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="#2980B9"/>
+        <Setter Property="Foreground" Value="White"/>
+    </Style>
+    
+    <!-- Secondary action button -->
+    <Style Selector="Button.secondary-button">
+        <Setter Property="Background" Value="#6c757d"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    
+    <!-- Secondary button hover -->
+    <Style Selector="Button.secondary-button:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="#5a6268"/>
+        <Setter Property="Foreground" Value="White"/>
+    </Style>
+    
+    <!-- Login/Signup Button Styling -->
+    <Style Selector="Button.login-button">
+        <Setter Property="Background" Value="#3498DB"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Height" Value="46"/>
+        <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+    
+    <!-- Login button hover -->
+    <Style Selector="Button.login-button:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="#2980B9"/>
+        <Setter Property="Foreground" Value="White"/>
+    </Style>
+    
+    <!-- Link button style -->
+    <Style Selector="Button.link-button">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="#3498DB"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    
+    <!-- Link button hover -->
+    <Style Selector="Button.link-button:pointerover /template/ ContentPresenter">
+        <Setter Property="Foreground" Value="#2980B9"/>
+        <Setter Property="Background" Value="Transparent"/>
+    </Style>
+    
+    <!-- Action buttons styling -->
+    <Style Selector="Button.action-button">
+        <Setter Property="Padding" Value="12,6"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Margin" Value="2"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+    
+    <Style Selector="Button.edit-button">
+        <Setter Property="Background" Value="#3498DB"/>
+    </Style>
+    
+    <Style Selector="Button.delete-button">
+        <Setter Property="Background" Value="#E74C3C"/>
+    </Style>
+    
+    <!-- Action button hover styles -->
+    <Style Selector="Button.action-button.edit-button:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="#2980B9"/>
+        <Setter Property="Foreground" Value="White"/>
+    </Style>
+
+    <Style Selector="Button.action-button.delete-button:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="#c0392b"/>
+        <Setter Property="Foreground" Value="White"/>
+    </Style>
+    
+    <!-- ======== LISTBOX STYLING ======== -->
+    <Style Selector="ListBox">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    
+    <Style Selector="ListBox ListBoxItem">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        <Setter Property="BorderBrush" Value="#E0E0E9"/>
+        <Setter Property="Padding" Value="8,12"/>
+        <Setter Property="Margin" Value="0"/>
+    </Style>
+    
+    <Style Selector="ListBox ListBoxItem:nth-child(odd)">
+        <Setter Property="Background" Value="#F9F9F9"/>
+    </Style>
+    
+    <Style Selector="ListBox ListBoxItem:pointerover">
+        <Setter Property="Background" Value="#ECF7FD"/>
+    </Style>
+    
+    <Style Selector="ListBox ListBoxItem:selected">
+        <Setter Property="Background" Value="#3498DB"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+    
+    <!-- Ensure text blocks inside ListBoxItems have proper colors -->
+    <Style Selector="ListBoxItem TextBlock">
+        <Setter Property="Foreground" Value="Black"/>
+    </Style>
+    
+    <Style Selector="ListBoxItem:selected TextBlock">
+        <Setter Property="Foreground" Value="White"/>
+    </Style>
+    
+    <!-- ======== CHECKBOX STYLES ======== -->
+    <Style Selector="CheckBox /template/ Border#NormalRectangle">
+        <Setter Property="BorderBrush" Value="#3498DB"/>
+    </Style>
+    
+    <!-- ======== DATAGRID STYLES ======== -->
+    <Style Selector="DataGrid">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    
+    <Style Selector="DataGridColumnHeader">
+        <Setter Property="Background" Value="#34495E"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Height" Value="40"/>
+        <Setter Property="Padding" Value="10,0"/>
+    </Style>
+    
+    <Style Selector="DataGridRow">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        <Setter Property="BorderBrush" Value="#E0E0E9"/>
+    </Style>
+    
+    <Style Selector="DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
+        <Setter Property="Fill" Value="#ECF7FD"/>
+        <Setter Property="Opacity" Value="0.5"/>
+    </Style>
+
+    <Style Selector="DataGrid DataGridRow:selected TextBlock">
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    
+        <Style Selector="DataGrid DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+            <Setter Property="Fill" Value="#3498DB" />
+            <Setter Property="Opacity" Value="1.0" />
+        </Style>
+    
+</Styles>

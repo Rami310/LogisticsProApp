@@ -1,0 +1,187 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:LogisticsPro.UI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="LogisticsPro.UI.Views.Logistics.LogisticsEmployee.LogisticsEmployeeContentView"
+             x:DataType="vm:LogisticsEmployeeDashboardViewModel">
+    
+    <Grid>
+        <!-- Dashboard Content (Shows when CurrentSectionView is null) -->
+        <ScrollViewer IsVisible="{Binding CurrentSectionView, Converter={x:Static ObjectConverters.IsNull}}"
+                      HorizontalScrollBarVisibility="Disabled" 
+                      VerticalScrollBarVisibility="Auto">
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto" Background="#F8FAFC">
+                
+                <!-- 1. Welcome Section -->
+                <Border Grid.Row="0" Background="white" Padding="25,15,25,15">
+                    <TextBlock Text="{Binding WelcomeMessage, FallbackValue='Welcome to Logistics Employee Dashboard!'}"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               Foreground="#1E293B" />
+                </Border>
+                
+                <!-- 2. KPI Cards -->
+                <Grid Grid.Row="1" ColumnDefinitions="*,*" Height="100" Margin="20,20,20,0">
+                    <!-- Total Tasks Card (Blue) -->
+                    <Border Grid.Column="0" Background="#3B82F6" CornerRadius="8" Margin="0,0,10,0">
+                        <StackPanel Margin="18" VerticalAlignment="Center">
+                            <TextBlock Text="📋 Total Tasks" FontSize="14" Foreground="White" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding TotalTasks, FallbackValue='0'}" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,4,0,0"/>  <!-- Changed from 2 to 4 -->
+                            <TextBlock Text="ready for delivery" FontSize="10" Foreground="White"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Completed Today Card -->
+                    <Border Grid.Column="1" Background="#10B981" CornerRadius="8" Margin="10,0,0,0">
+                        <StackPanel Margin="18" VerticalAlignment="Center">
+                            <TextBlock Text="✅ Completed Tasks" FontSize="14" Foreground="White" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding CompletedTasks, FallbackValue='0'}" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,4,0,0"/>
+                            <TextBlock Text="deliveries confirmed" FontSize="10" Foreground="White"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+                
+                <!-- 3. Recent Activity Summary -->
+                <StackPanel Grid.Row="2" Margin="20,35,20,10">
+                    <TextBlock Text="📊 Recent Delivery Activity" FontSize="18" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,15"/>
+                    
+                    <Grid ColumnDefinitions="*,*">
+                        <!-- Recent Confirmations (Left) -->
+                        <Border Grid.Column="0" Background="White" BorderBrush="#10B981" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="✅ Recent Confirmations" FontWeight="Bold" FontSize="16" Foreground="#10B981" Margin="0,0,0,15"/>
+                                
+                                <!-- Recent Confirmations -->
+                                <ItemsControl ItemsSource="{Binding RecentConfirmedOrders}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#F0FDF4" BorderBrush="#BBF7D0" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,5">
+                                                <Grid ColumnDefinitions="*,Auto">
+                                                    <StackPanel Grid.Column="0">
+                                                        <!-- Product name unchanged -->
+                                                        <TextBlock Text="{Binding Product.Name}" FontWeight="SemiBold" FontSize="12" Foreground="#166534"/>
+                                                        <!-- Binding to computed property -->
+                                                        <TextBlock Text="{Binding QuantityWithEmployee}" FontSize="10" Foreground="#15803D"/>
+                                                    </StackPanel>
+                                                    <!-- Cost unchanged -->
+                                                    <TextBlock Grid.Column="1" Text="{Binding TotalCost, StringFormat='${0:F0}'}" FontSize="11" FontWeight="Bold" Foreground="#16A34A" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                
+                                <TextBlock Text="No recent confirmations" 
+                                          FontStyle="Italic" 
+                                          Foreground="#6B7280" 
+                                          FontSize="12"
+                                          HorizontalAlignment="Center"
+                                          Margin="0,20,0,0"
+                                          IsVisible="{Binding !RecentConfirmedOrders.Count}"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <!-- Recent Aborts (Right) -->
+                        <Border Grid.Column="1" Background="White" BorderBrush="#EF4444" BorderThickness="1" CornerRadius="8" Padding="15" Margin="10,0,0,0">
+                            <StackPanel>
+                                <TextBlock Text="🚫 Recent Aborts" FontWeight="Bold" FontSize="16" Foreground="#EF4444" Margin="0,0,0,15"/>
+                                <ItemsControl ItemsSource="{Binding RecentAbortedOrders}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#FEF2F2" BorderBrush="#FECACA" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,5">
+                                                <Grid ColumnDefinitions="*,Auto">
+                                                    <StackPanel Grid.Column="0">
+                                                        <!-- Product name unchanged -->
+                                                        <TextBlock Text="{Binding Product.Name}" FontWeight="SemiBold" FontSize="12" Foreground="#991B1B"/>
+                                                        <!-- Binding to computed property -->
+                                                        <TextBlock Text="{Binding QuantityWithAbortedBy}" FontSize="10" Foreground="#B91C1C"/>
+                                                    </StackPanel>
+                                                    <!-- Cost unchanged -->
+                                                    <TextBlock Grid.Column="1" Text="{Binding TotalCost, StringFormat='${0:F0}'}" FontSize="11" FontWeight="Bold" Foreground="#DC2626" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                
+                                <TextBlock Text="No recent aborts" 
+                                          FontStyle="Italic" 
+                                          Foreground="#6B7280" 
+                                          FontSize="12"
+                                          HorizontalAlignment="Center"
+                                          Margin="0,20,0,0"
+                                          IsVisible="{Binding !RecentAbortedOrders.Count}"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+                
+                <!-- 4. Quick Actions Section -->
+                <StackPanel Grid.Row="3" Margin="20,35,20,20">
+                    <TextBlock Text="⚡ Quick Actions" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,15"/>
+                    
+                    <Grid ColumnDefinitions="*,*">
+                        <!-- Action Card -->
+                        <Border Grid.Column="0" CornerRadius="12" Height="100" Margin="0,0,10,0">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Color="#1E3A8A" Offset="0"/>
+                                    <GradientStop Color="#1D4ED8" Offset="0.5"/>
+                                    <GradientStop Color="#2563EB" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            
+                            <Button Background="Transparent" 
+                                    BorderThickness="0" 
+                                    Command="{Binding NavigateToSectionCommand}" 
+                                    CommandParameter="MyTasks"
+                                    HorizontalContentAlignment="Stretch" 
+                                    VerticalContentAlignment="Stretch"
+                                    CornerRadius="12">
+                                <Grid ColumnDefinitions="Auto,*">
+                                    <!-- Icon -->
+                                    <Border Grid.Column="0" 
+                                            Background="Gold" 
+                                            CornerRadius="10" 
+                                            Width="65" 
+                                            Height="65" 
+                                            Margin="25,0,0,0">
+                                        <TextBlock Text="🚚" 
+                                                   FontSize="28" 
+                                                   Foreground="White" 
+                                                   FontWeight="Bold"
+                                                   HorizontalAlignment="Center" 
+                                                   VerticalAlignment="Center"/>
+                                    </Border>
+                                    
+                                    <!-- Text Content -->
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="22,0,25,0">
+                                        <TextBlock Text="Process Shipment Orders" 
+                                                   FontSize="18" 
+                                                   Foreground="White" 
+                                                   FontWeight="Bold"/>
+                                        <TextBlock Text="Confirm deliveries or abort failed shipments" 
+                                                   FontSize="13" 
+                                                   Foreground="White" 
+                                                   Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Button>
+                        </Border>
+                        <!-- Empty Second Column -->
+                        <Border Grid.Column="1" />
+                    </Grid>
+                </StackPanel>
+                
+            </Grid>
+        </ScrollViewer>
+
+        <!-- Section Content (MyTasks, Performance, etc.) -->
+        <ContentControl Content="{Binding CurrentSectionView}"
+                        IsVisible="{Binding CurrentSectionView, Converter={x:Static ObjectConverters.IsNotNull}}"
+                        HorizontalContentAlignment="Stretch"
+                        VerticalContentAlignment="Stretch" />
+    </Grid>
+</UserControl>

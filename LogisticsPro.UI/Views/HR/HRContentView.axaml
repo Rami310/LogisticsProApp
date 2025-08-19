@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:LogisticsPro.UI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="LogisticsPro.UI.Views.HR.HRContentView"
+             x:DataType="vm:HRDashboardViewModel">
+    
+    <Grid>
+        <!-- Debug Info -->
+        <Border VerticalAlignment="Top" HorizontalAlignment="Right" 
+                Background="#80000000" Padding="10" Margin="10">
+            <StackPanel>
+                <TextBlock Text="{Binding Username}" Foreground="White"/>
+                <TextBlock Text="{Binding CurrentSection}" Foreground="White"/>
+                <TextBlock Text="{Binding Employees.Count, StringFormat='Employees: {0}'}" Foreground="White"/>
+                <TextBlock Text="{Binding CurrentSectionView, StringFormat='View: {0}'}" Foreground="White"/>
+            </StackPanel>
+        </Border>
+        
+        <!-- Main Content -->
+        <ContentControl x:Name="ContentControl"
+                        Content="{Binding CurrentSectionView}"
+                        HorizontalContentAlignment="Stretch"
+                        VerticalContentAlignment="Stretch" />
+                        
+        <!-- Fallback Content -->
+        <TextBlock Text="HR Dashboard Content (No section view loaded)" 
+                   IsVisible="{Binding CurrentSectionView, Converter={x:Static ObjectConverters.IsNull}}"
+                   FontSize="24"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Foreground="Red"/> 
+    </Grid>
+</UserControl>

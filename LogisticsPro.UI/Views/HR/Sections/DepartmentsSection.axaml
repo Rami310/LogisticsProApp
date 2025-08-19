@@ -1,0 +1,143 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:LogisticsPro.UI.ViewModels"
+             x:Class="LogisticsPro.UI.Views.HR.Sections.DepartmentsSection"
+             x:DataType="vm:HRDashboardViewModel"
+             Background="White">
+
+    <ScrollViewer Background="White">
+        <StackPanel Margin="30" Spacing="25">
+            
+            <!-- Simple Header -->
+            <TextBlock Text="Departments Overview" 
+                       FontSize="24" 
+                       FontWeight="SemiBold" 
+                       Foreground="#2C3E50" />
+
+            <!-- Simple Department Cards Grid -->
+            <ItemsControl ItemsSource="{Binding Departments}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="3" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <!-- Simple Card with Fixed Width -->
+                        <Border Background="White"
+                                BorderBrush="#E0E6ED"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Margin="10"
+                                Padding="20"
+                                BoxShadow="0 1 3 0 #20000000">
+                            
+                            <StackPanel Spacing="15">
+                                <!-- Simple Header -->
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Grid.Column="0"
+                                               Text="{Binding Name}"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               Foreground="#2C3E50"/>
+                                    
+                                    <!-- Simple Count Badge -->
+                                    <Border Grid.Column="1"
+                                            Background="#3498DB"
+                                            Padding="6,3"
+                                            CornerRadius="10">
+                                        <TextBlock Text="{Binding Employees.Count}"
+                                                   FontSize="12"
+                                                   FontWeight="Bold"
+                                                   Foreground="White"/>
+                                    </Border>
+                                </Grid>
+
+                                <!-- Employee List with Scroll -->
+                                <ScrollViewer MaxHeight="150" 
+                                              VerticalScrollBarVisibility="Auto"
+                                              HorizontalScrollBarVisibility="Disabled">
+                                    <ItemsControl ItemsSource="{Binding Employees}">
+                                        <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <!-- Clickable Employee Row -->
+                                            <Button Background="Transparent"
+                                                    BorderThickness="0"
+                                                    Padding="8,6"
+                                                    Margin="0,0,0,4"
+                                                    HorizontalAlignment="Stretch"
+                                                    HorizontalContentAlignment="Left"
+                                                    CornerRadius="4"
+                                                    Command="{Binding $parent[UserControl].((vm:HRDashboardViewModel)DataContext).NavigateToEmployeeCommand}"
+                                                    CommandParameter="{Binding}">
+                                                
+                                                <Button.Styles>
+                                                    <Style Selector="Button:pointerover">
+                                                        <Setter Property="Background" Value="#F0F8FF"/>
+                                                    </Style>
+                                                </Button.Styles>
+                                                
+                                                <Grid ColumnDefinitions="Auto,*">
+                                                    <!-- Simple Avatar -->
+                                                    <Border Grid.Column="0" 
+                                                            Width="28" 
+                                                            Height="28"
+                                                            CornerRadius="14"
+                                                            Background="#3498DB"
+                                                            Margin="0,0,10,0">
+                                                        <TextBlock Text="{Binding Name, StringFormat='{}{0:C1}'}" 
+                                                                   FontSize="12" 
+                                                                   FontWeight="Bold"
+                                                                   Foreground="White"
+                                                                   HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center" />
+                                                    </Border>
+                                                    
+                                                    <!-- Employee Info with Better Green Dot -->
+                                                    <Grid Grid.Column="1" ColumnDefinitions="*,Auto">
+                                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                            <TextBlock FontSize="13" 
+                                                                       FontWeight="Medium"
+                                                                       Foreground="#2C3E50">
+                                                                <Run Text="{Binding Name}"/>
+                                                                <Run Text=" "/>
+                                                                <Run Text="{Binding LastName}"/>
+                                                            </TextBlock>
+                                                            <TextBlock Text="{Binding Role}"
+                                                                       FontSize="11"
+                                                                       Foreground="#7F8C8D"/>
+                                                        </StackPanel>
+                                                        
+                                                        <!-- Better Positioned Green Dot -->
+                                                        <Border Grid.Column="1"
+                                                                Background="#27AE60"
+                                                                Width="6"
+                                                                Height="6"
+                                                                CornerRadius="3"
+                                                                VerticalAlignment="Top"
+                                                                Margin="0,4,0,0"/>
+                                                    </Grid>
+                                                </Grid>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                </ScrollViewer>
+                                
+                                <!-- Empty State -->
+                                <TextBlock Text="No employees assigned"
+                                           FontSize="12"
+                                           Foreground="#95A5A6"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,10"
+                                           IsVisible="{Binding Employees.Count, Converter={x:Static ObjectConverters.Equal}, ConverterParameter=0}"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

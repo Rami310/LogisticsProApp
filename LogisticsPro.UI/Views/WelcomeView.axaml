@@ -1,0 +1,56 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:LogisticsPro.UI.ViewModels"
+             x:Class="LogisticsPro.UI.Views.WelcomeView"
+             x:DataType="vm:MainWindowViewModel"
+             Background="Transparent">
+    
+    <UserControl.RenderTransform>
+        <ScaleTransform/>
+    </UserControl.RenderTransform>
+    
+    <UserControl.Styles>
+        <!-- Logo Fade In -->
+        <Style Selector="Image">
+            <Style.Animations>
+                <Animation Duration="0:0:0.6" Delay="0:0:0.2" FillMode="Forward">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="0"/>
+                        <Setter Property="TranslateTransform.Y" Value="20"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="1"/>
+                        <Setter Property="TranslateTransform.Y" Value="0"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+        
+        <!-- Logo Fade Out -->
+        <Style Selector="UserControl.fade-out">
+            <Style.Animations>
+                <Animation Duration="0:0:0.5" FillMode="Forward">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="1"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="0"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid Background="Black">
+        <!-- Logo Image Only -->
+        <Image Source="/Assets/logistics pro text as a logo.jpg" 
+               Stretch="UniformToFill"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               Opacity="0">
+            <Image.RenderTransform>
+                <TranslateTransform/>
+            </Image.RenderTransform>
+        </Image>
+    </Grid>
+</UserControl>

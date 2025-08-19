@@ -1,0 +1,140 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:LogisticsPro.UI.Converters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="LogisticsPro.UI.Views.Shared.DashboardLayout"
+             Background="White">
+
+    <!-- Add converters as resources -->
+    <UserControl.Resources>
+        <converters:BoolToToggleIconConverter x:Key="BoolToToggleIconConverter"/>
+        <converters:BoolToWidthConverter x:Key="BoolToWidthConverter"/>
+        <converters:BoolToMarginConverter x:Key="BoolToMarginConverter"/>
+    </UserControl.Resources>
+
+    <!--  Main Grid with collapsible sidebar -->
+    <Grid ColumnDefinitions="Auto,*" Background="White">
+        
+        <!--  COLLAPSIBLE SIDEBAR CONTAINER -->
+        <Grid Grid.Column="0" 
+              Width="{Binding IsSidebarExpanded, Converter={StaticResource BoolToWidthConverter}}"
+              Background="#2C3E50">
+            
+            <!-- SIDEBAR CONTENT -->
+            <Border Background="#2C3E50"
+                    BorderThickness="0"
+                    IsVisible="{Binding IsSidebarExpanded}">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" 
+                              VerticalScrollBarVisibility="Auto"
+                              Background="Transparent">
+                    <ContentControl x:Name="SidebarContent"
+                                    Background="Transparent"/>
+                </ScrollViewer>
+            </Border>
+            
+            <!-- SIDEBAR TOGGLE BUTTON (Overlayed on top) -->
+            <Button Command="{Binding ToggleSidebarCommand}"
+                    Background="#34495E"
+                    BorderThickness="0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Margin="12,10,20,0"
+                    Width="40" Height="40"
+                    CornerRadius="20"
+                    ToolTip.Tip="Hide Sidebar"
+                    ZIndex="1000"
+                    IsVisible="{Binding IsSidebarExpanded}"
+                    Padding="0">
+                <TextBlock Text="{Binding IsSidebarExpanded, Converter={StaticResource BoolToToggleIconConverter}}"
+                           FontSize="17"
+                           FontWeight="Bold"
+                           Foreground="White"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           TextAlignment="Center"/>
+            </Button>
+        </Grid>
+
+        <!-- MAIN CONTENT AREA - Responsive to sidebar width -->
+        <Grid Grid.Column="1" 
+              RowDefinitions="Auto,*"
+              Background="White">
+            
+            <!-- Header with Title and Date/Time -->
+            <Border Grid.Row="0" 
+                    Background="White"
+                    BorderThickness="0"
+                    Padding="20,10">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    
+                    <!-- HEADER TOGGLE BUTTON -->
+                    <Button Grid.Column="0"
+                            Command="{Binding ToggleSidebarCommand}"
+                            Background="#34495E"
+                            BorderThickness="0"
+                            Width="40" Height="40"
+                            CornerRadius="20"
+                            ToolTip.Tip="Show Sidebar"
+                            Margin="0,0,0,0"
+                            VerticalAlignment="Center"
+                            IsVisible="{Binding !IsSidebarExpanded}"
+                            Padding="0">
+                        <TextBlock Text="{Binding IsSidebarExpanded, Converter={StaticResource BoolToToggleIconConverter}}"
+                                   FontSize="17"
+                                   FontWeight="Bold"
+                                   Foreground="White"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   TextAlignment="Center"/>
+                    </Button>
+                    
+                    <!-- TITLE SECTION: Hidden for cleaner header -->
+                    <StackPanel Grid.Column="1" 
+                                VerticalAlignment="Center"
+                                Margin="{Binding !IsSidebarExpanded, Converter={StaticResource BoolToMarginConverter}}"
+                                IsVisible="False">
+                        <TextBlock x:Name="DashboardTitle"
+                                   FontSize="20"
+                                   FontWeight="Medium"
+                                   Foreground="#34495E"
+                                   Opacity="0.8"
+                                   Margin="0,0,0,2" />
+                    </StackPanel>
+                    
+                    <!-- Date/Time to Right Side for Professional Look -->
+                    <StackPanel Grid.Column="2" 
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Right">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock x:Name="CurrentDate"
+                                       FontSize="13" 
+                                       Foreground="Black"
+                                       FontWeight="Medium" />
+                            <TextBlock Text="•" 
+                                       FontSize="13" 
+                                       Foreground="Black"/>
+                            <TextBlock x:Name="CurrentTime"
+                                       FontSize="13" 
+                                       Foreground="Black"
+                                       FontWeight="Medium" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- MAIN CONTENT - Also scrollable for long content -->
+            <ScrollViewer Grid.Row="1"
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto"
+                          Background="White">
+                <ContentControl x:Name="MainContent" 
+                                Background="White"
+                                BorderThickness="0"
+                                Padding="0"
+                                Margin="0"/>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>

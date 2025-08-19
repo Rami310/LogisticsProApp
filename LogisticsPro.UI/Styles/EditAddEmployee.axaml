@@ -1,0 +1,117 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Field Label Style -->
+    <Style Selector="TextBlock.field-label">
+        <Setter Property="Foreground" Value="#2C3E50"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="Margin" Value="0,0,0,8"/>
+    </Style>
+
+    <!-- Clean Input Style -->
+    <Style Selector="TextBox.clean-input">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderBrush" Value="#DDD"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="MinHeight" Value="36"/>
+        <Setter Property="Foreground" Value="#333"/>
+        <Setter Property="FontSize" Value="14"/>
+    </Style>
+    
+    <Style Selector="TextBox.clean-input:focus">
+        <Setter Property="BorderBrush" Value="#3498DB"/>
+        <Setter Property="BorderThickness" Value="2"/>
+    </Style>
+
+    <Style Selector="TextBox.clean-input:pointerover">
+        <Setter Property="BorderBrush" Value="#3498DB"/>
+        <Setter Property="Background" Value="#FAFAFA"/>
+    </Style>
+
+    <!-- ComboBox Styles - Colors -->
+    <Style Selector="ComboBox.clean-dropdown">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderBrush" Value="#DDD"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="MinHeight" Value="36"/>
+        <Setter Property="Foreground" Value="#333"/>
+        <Setter Property="FontSize" Value="14"/>
+    </Style>
+    
+    <Style Selector="ComboBox.clean-dropdown:pointerover">
+        <Setter Property="BorderBrush" Value="#3498DB"/>
+        <Setter Property="Background" Value="#FAFAFA"/>
+    </Style>
+    
+    <Style Selector="ComboBox.clean-dropdown:focus">
+        <Setter Property="BorderBrush" Value="#3498DB"/>
+        <Setter Property="BorderThickness" Value="2"/>
+    </Style>
+
+    <!-- Professional dropdown popup styling -->
+    <Style Selector="ComboBox.clean-dropdown /template/ Popup#PART_Popup">
+        <Setter Property="IsLightDismissEnabled" Value="True"/>
+    </Style>
+    
+    <!--White background for dropdown popup -->
+    <Style Selector="ComboBox.clean-dropdown /template/ Border#PART_PopupBorder">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderBrush" Value="#DDD"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="BoxShadow" Value="0 4 12 0 #20000000"/>
+        <Setter Property="Margin" Value="0,2,0,0"/>
+    </Style>
+
+    <!-- ComboBox item styling with white background -->
+    <Style Selector="ComboBox.clean-dropdown ComboBoxItem">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="Foreground" Value="#333"/>
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="MinHeight" Value="36"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    
+    <Style Selector="ComboBox.clean-dropdown ComboBoxItem:pointerover">
+        <Setter Property="Background" Value="#E8F4FD"/>
+        <Setter Property="Foreground" Value="#2C3E50"/>
+    </Style>
+    
+    <Style Selector="ComboBox.clean-dropdown ComboBoxItem:selected">
+        <Setter Property="Background" Value="#3498DB"/>
+        <Setter Property="Foreground" Value="White"/>
+    </Style>
+
+    <!--Override system ComboBox text colors -->
+    <Style Selector="ComboBox.clean-dropdown /template/ TextBlock">
+        <Setter Property="Foreground" Value="#333"/>
+    </Style>
+
+    <Style Selector="ComboBox.clean-dropdown /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Foreground" Value="#333"/>
+    </Style>
+
+    <!-- Primary Button Style -->
+    <Style Selector="Button.primary-btn">
+        <Setter Property="Background" Value="#3498DB"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontSize" Value="14"/>
+    </Style>
+
+    <Style Selector="Button.primary-btn:pointerover">
+        <Setter Property="Background" Value="#2980B9"/>
+    </Style>
+
+    <Style Selector="Button.primary-btn:pressed">
+        <Setter Property="Background" Value="#21618C"/>
+    </Style>
+
+</Styles>

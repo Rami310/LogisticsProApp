@@ -1,0 +1,86 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="250"
+             x:Class="LogisticsPro.UI.Views.Shared.BaseSidebarView">
+    
+    <Grid>
+        <!-- Same gradient as login screen -->
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Offset="0" Color="#3498DB" />
+                <GradientStop Offset="1" Color="#27AE60" />
+            </LinearGradientBrush>
+        </Grid.Background>
+        
+    <!-- Using DockPanel to organize top, middle, and bottom sections -->
+            <DockPanel Margin="15">
+                
+                <!-- TOP SECTION: Logo and Title -->
+                <StackPanel DockPanel.Dock="Top" Spacing="15">
+                    
+                    <!-- Logo and Title -->
+                    <StackPanel Spacing="10" Margin="0,0,0,20">
+                        <!-- Logo -->
+                        <Border Width="60" Height="60"
+                                HorizontalAlignment="Center"
+                                CornerRadius="30"
+                                ClipToBounds="True"
+                                Background="#3498DB">
+                            <Image Source="/Assets/logistics pro text as a logo.jpg"
+                                   Stretch="UniformToFill" />
+                        </Border>
+                        
+                        <TextBlock Text="LogisticsPro"
+                                   Foreground="White"
+                                   FontSize="22"
+                                   FontWeight="Bold"
+                                   HorizontalAlignment="Center" />
+                    </StackPanel>
+                    
+                    <!-- MENU ITEMS PLACEHOLDER - (Override this in each dashboard) -->
+                    <ContentControl x:Name="MenuItemsPlaceholder" />
+                    
+                </StackPanel>
+                
+                <!-- BOTTOM SECTION: User Profile and Logout (Always the same) -->
+                <StackPanel DockPanel.Dock="Bottom" Spacing="15">
+            
+                    <!-- Logout Button -->
+                    <Button Classes="sidebar-button logout-button" x:Name="LogoutButton">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="🚪" FontSize="16" />
+                            <TextBlock Text="Logout" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                    <!-- User Profile Section -->
+                    <Border Background="#243342" CornerRadius="5">
+                        <StackPanel Orientation="Horizontal" Spacing="10" Margin="10">
+                            <Border Width="36" Height="36"
+                                    CornerRadius="18"
+                                    Background="#3498DB"
+                                    ClipToBounds="True">
+                                <TextBlock x:Name="UsernameInitial"
+                                           FontSize="18"
+                                           FontWeight="Bold"
+                                           Foreground="White"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock x:Name="Username" Foreground="White" FontWeight="SemiBold" />
+                                <TextBlock x:Name="UserRole" Foreground="#95A5A6" FontSize="12" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    
+                </StackPanel>
+        
+                <!-- MIDDLE SECTION: Spacer (fills remaining space) -->
+                <Border DockPanel.Dock="Top" Height="20" Background="Transparent" />
+        
+            </DockPanel>
+        </Grid>
+</UserControl>

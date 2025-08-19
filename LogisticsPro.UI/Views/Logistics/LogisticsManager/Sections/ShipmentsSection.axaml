@@ -1,0 +1,139 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:LogisticsPro.UI.ViewModels"
+             x:Class="LogisticsPro.UI.Views.Logistics.LogisticsManager.Sections.ShipmentsSection"
+             x:DataType="vm:LogisticsManagerDashboardViewModel">
+    
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="25" Spacing="25">
+            
+            <!-- Header -->
+            <StackPanel>
+                <TextBlock Text="📋 Shipments Overview" FontSize="28" FontWeight="Bold" Foreground="Black"/>
+                <TextBlock Text="View employee delivery decisions: sold out and aborted deliveries" FontSize="16" Foreground="#2C3E50"/>
+            </StackPanel>
+            
+            <!-- Summary Cards -->
+            <Grid ColumnDefinitions="*,*" Height="120">
+                <!-- Sold Out/Delivered -->
+                <Border Grid.Column="0" Background="#10B981" CornerRadius="10" Margin="0,0,10,0">
+                    <StackPanel Margin="20" VerticalAlignment="Center">
+                        <TextBlock Text="Sold Out" FontSize="16" Foreground="White" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding SoldOutShipmentCount, FallbackValue='0'}" 
+                                   FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,5,0,0"/>
+                        <TextBlock Text="successfully delivered" FontSize="13" Foreground="White"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Aborted Deliveries -->
+                <Border Grid.Column="1" Background="#EF4444" CornerRadius="10" Margin="10,0,0,0">
+                    <StackPanel Margin="20" VerticalAlignment="Center">
+                        <TextBlock Text="Aborted" FontSize="16" Foreground="White" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding AbortedShipmentCount, FallbackValue='0'}" 
+                                   FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,5,0,0"/>
+                        <TextBlock Text="delivery aborted" FontSize="13" Foreground="White"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+            
+            <!-- Shipment Requests Table -->
+            <Border Background="White" BorderBrush="Black" BorderThickness="2" CornerRadius="12" Padding="25">
+                <StackPanel>
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,20">
+                        <TextBlock Grid.Column="0" Text="📋 Completed Orders History" FontSize="20" FontWeight="Bold" Foreground="#2C3E50"/>                        
+                        <Button Grid.Column="1" 
+                                Classes="secondary-button" 
+                                Height="36" 
+                                Width="100"
+                                Command="{Binding RefreshDataCommand}"
+                                Background="#10B981"
+                                Foreground="White"
+                                BorderThickness="0"
+                                CornerRadius="6"
+                                FontWeight="SemiBold">
+                            <TextBlock Text="Refresh" FontSize="13" FontWeight="SemiBold"/>
+                        </Button>
+                    </Grid>
+                    
+                    <DataGrid ItemsSource="{Binding PaginatedShipmentRequests}"
+                              AutoGenerateColumns="False" 
+                              IsReadOnly="True"
+                              GridLinesVisibility="Horizontal"
+                              BorderThickness="2"
+                              BorderBrush="Black"
+                              MinHeight="400"
+                              CanUserReorderColumns="True"
+                              CanUserResizeColumns="True"
+                              CanUserSortColumns="True">
+                              
+                        <!-- Professional DataGrid Styling -->
+                        <DataGrid.Styles>
+                            <Style Selector="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#374151"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                <Setter Property="Height" Value="42"/>
+                                <Setter Property="Padding" Value="12,0"/>
+                                <Setter Property="FontSize" Value="13"/>
+                            </Style>
+                            
+                            <Style Selector="DataGridRow">
+                                <Setter Property="Background" Value="White"/>
+                                <Setter Property="MinHeight" Value="40"/>
+                            </Style>
+                            
+                            <Style Selector="DataGridRow:pointerover">
+                                <Setter Property="Background" Value="#F9FAFB"/>
+                            </Style>
+                        </DataGrid.Styles>
+                        
+                        <DataGrid.Columns>
+                                <DataGridTextColumn Header="#" 
+                                                    Binding="{Binding UIId, FallbackValue='N/A'}" 
+                                                    Width="70"
+                                                    MinWidth="40"/>
+                                <DataGridTextColumn Header="Product" 
+                                                    Binding="{Binding Product, FallbackValue='N/A'}" 
+                                                    Width="160"
+                                                    MinWidth="120"/>
+                                <DataGridTextColumn Header="Quantity" 
+                                                    Binding="{Binding RequestedQuantity, FallbackValue='0'}" 
+                                                    Width="110"
+                                                    MinWidth="80"/>
+                                <DataGridTextColumn Header="Requested By" 
+                                                    Binding="{Binding RequestedBy, FallbackValue='N/A'}" 
+                                                    Width="145"
+                                                    MinWidth="120"/>
+                                <DataGridTextColumn Header="Status" 
+                                                    Binding="{Binding RequestStatus, FallbackValue='N/A'}" 
+                                                    Width="140"
+                                                    MinWidth="100"/>
+                                <DataGridTextColumn Header="Request Date" 
+                                                    Binding="{Binding RequestDate, StringFormat='MM-dd HH:mm', FallbackValue='N/A'}" 
+                                                    Width="150"
+                                                    MinWidth="130"/>
+                                <DataGridTextColumn Header="Total Cost" 
+                                                    Binding="{Binding TotalCost, StringFormat='${0:F2}', FallbackValue='$0.00'}" 
+                                                    Width="150"
+                                                    MinWidth="120"/>
+                            </DataGrid.Columns>
+                    </DataGrid>
+                    
+                    <!-- Empty state -->
+                    <Border IsVisible="{Binding ShipmentRequests.Count, Converter={x:Static ObjectConverters.Equal}, ConverterParameter=0}"
+                            Background="#F8F9FA" 
+                            CornerRadius="8" 
+                            Padding="40" 
+                            Margin="0,20,0,0">
+                        <StackPanel Spacing="10" HorizontalAlignment="Center">
+                            <TextBlock Text="📦" FontSize="48" HorizontalAlignment="Center" Foreground="#ADB5BD"/>
+                            <TextBlock Text="No shipment items found" FontSize="16" FontWeight="SemiBold" Foreground="#6C757D" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Inventory items at various shipment stages will appear here" FontSize="14" Foreground="#ADB5BD" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+            
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

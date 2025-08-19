@@ -1,0 +1,36 @@
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+
+# OS Files (Mac + Windows)
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+
+# Build outputs
+bin/
+obj/
+Debug/
+Release/
+
+# IDE files
+.vs/
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# User-specific files
+*.user
+*.userosscache
+*.sln.docstates
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite

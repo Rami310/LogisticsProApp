@@ -1,0 +1,153 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:LogisticsPro.UI.ViewModels"
+             xmlns:shared="clr-namespace:LogisticsPro.UI.Views.Shared"
+             x:Class="LogisticsPro.UI.Views.Warehouse.WarehouseManager.WarehouseManagerContentView"
+             x:DataType="vm:WarehouseManagerDashboardViewModel">
+    
+    <!-- Show either main dashboard OR section content -->
+    <Grid>
+        <!-- MAIN DASHBOARD - Shows when CurrentSectionView is null -->
+        <Grid IsVisible="{Binding CurrentSectionView, Converter={x:Static ObjectConverters.IsNull}}"
+              RowDefinitions="Auto,Auto,*">
+            
+            <!-- Welcome Message FIRST -->
+            <Border Grid.Row="0" Background="White" Padding="25,15,25,15">
+                <TextBlock Text="{Binding WelcomeMessage, FallbackValue='Welcome to Warehouse Dashboard!'}"
+                           FontSize="20"
+                           FontWeight="SemiBold"
+                           Foreground="#1E293B" />
+            </Border>
+            
+            <!-- Revenue Section SECOND - Below welcome -->
+            <shared:RevenueSectionView Grid.Row="1" 
+                                       DataContext="{Binding RevenueViewModel}"
+                                       Margin="20,30,20,20"/>
+        
+            <!-- Main Dashboard Content THIRD -->
+            <ScrollViewer Grid.Row="2"
+                          HorizontalScrollBarVisibility="Disabled" 
+                          VerticalScrollBarVisibility="Auto">
+                <StackPanel Background="White" Margin="0">
+
+                <!-- Compact Statistics Bar -->
+                <Border Background="White" BorderBrush="black" BorderThickness="2" CornerRadius="8" Height="80" Padding="25,0" Margin="30,20,30,30">
+                    <Grid ColumnDefinitions="*,*,*,*,*">
+                        <!-- Total Stock Quantity -->
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding TotalStockQuantity}" FontSize="24" FontWeight="Bold" Foreground="#3B82F6" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Total Stock" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                        
+                        <!-- Separator -->
+                        <Border Grid.Column="0" Width="2" Background="Black" HorizontalAlignment="Right" Margin="0,15"/>
+                        
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding PendingRequests.Count}" FontSize="24" FontWeight="Bold" Foreground="#EAB308" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Pending" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                        
+                        <!-- Separator -->
+                        <Border Grid.Column="1" Width="2" Background="Black" HorizontalAlignment="Right" Margin="0,15"/>
+                        
+                        <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding LowStockItems.Count}" FontSize="24" FontWeight="Bold" Foreground="#EF4444" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Low Stock" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                        
+                        <!-- Separator -->
+                        <Border Grid.Column="2" Width="2" Background="Black" HorizontalAlignment="Right" Margin="0,15"/>
+                        
+                        <StackPanel Grid.Column="3" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding ApprovedRequestsCount}" FontSize="24" FontWeight="Bold" Foreground="#10B981" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Approved" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                        
+                        <!-- Separator -->
+                        <Border Grid.Column="3" Width="2" Background="Black" HorizontalAlignment="Right" Margin="0,15"/>
+                        
+                        <!-- Available Budget - Simple K format -->
+                        <StackPanel Grid.Column="4" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding AvailableBudgetDisplayK}" FontSize="24" FontWeight="Bold" Foreground="#8B5CF6" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Available" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Quick Action -->
+                <StackPanel Margin="30,0,30,30">
+                    <TextBlock Text="⚡ Quick Actions" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,15" />
+                    
+                    <!-- Single Action Card -->
+                    <Grid ColumnDefinitions="1*,1*">  <!-- Added "Grid" -->
+                        <Border Grid.Column="0" CornerRadius="12" Height="100">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Color="#1E3A8A" Offset="0"/>
+                                    <GradientStop Color="#1D4ED8" Offset="0.5"/>
+                                    <GradientStop Color="#2563EB" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            
+                            <Button Background="Transparent" 
+                                    BorderThickness="0" 
+                                    Command="{Binding NavigateToSectionCommand}" 
+                                    CommandParameter="ProductRequests"
+                                    HorizontalContentAlignment="Stretch" 
+                                    VerticalContentAlignment="Stretch"
+                                    CornerRadius="12">
+                                <Grid ColumnDefinitions="Auto,*">
+                                    <!-- Icon -->
+                                    <Border Grid.Column="0" 
+                                            Background="Gold" 
+                                            CornerRadius="10" 
+                                            Width="65" 
+                                            Height="65" 
+                                            Margin="25,0,0,0">
+                                        <TextBlock Text="+" 
+                                                   FontSize="32" 
+                                                   Foreground="White" 
+                                                   FontWeight="Bold"
+                                                   HorizontalAlignment="Center" 
+                                                   VerticalAlignment="Center"/>
+                                    </Border>
+                                    
+                                    <!-- Text Content -->
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="22,0,25,0">
+                                        <TextBlock Text="Create New Product Request" 
+                                                   FontSize="18" 
+                                                   Foreground="White" 
+                                                   FontWeight="Bold"/>
+                                        <TextBlock Text="Submit a new order for warehouse inventory" 
+                                                   FontSize="13" 
+                                                   Foreground="#BFDBFE" 
+                                                   Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Button>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+                
+                    <!-- Loading Indicator -->
+                    <Grid Background="#80FFFFFF" 
+                          IsVisible="{Binding IsLoading, FallbackValue='false'}"
+                          ZIndex="1000"
+                          Height="100"
+                          Margin="0,20">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <ProgressBar IsIndeterminate="True" Width="200" Height="4" />
+                            <TextBlock Text="Loading..." Margin="0,10,0,0" HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+        
+        <!-- SECTION CONTENT - Shows when CurrentSectionView is NOT null -->
+        <ContentControl Content="{Binding CurrentSectionView}"
+                        IsVisible="{Binding CurrentSectionView, Converter={x:Static ObjectConverters.IsNotNull}}"
+                        HorizontalContentAlignment="Stretch"
+                        VerticalContentAlignment="Stretch" />
+    </Grid>
+</UserControl>

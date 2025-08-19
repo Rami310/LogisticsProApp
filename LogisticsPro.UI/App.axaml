@@ -1,0 +1,106 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="LogisticsPro.UI.App"
+             xmlns:local="using:LogisticsPro.UI"
+             xmlns:converters="clr-namespace:LogisticsPro.UI.Converters"
+             RequestedThemeVariant="Default">
+
+    <!-- ViewLocator for Dynamic MVVM Binding -->
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+
+    <!-- Global Styles & Theme -->
+    <Application.Styles>
+        <!-- Base theme first -->
+        <FluentTheme/>
+        
+        <Style Selector="TextBox">
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+        
+        <Style Selector="TextBox /template/ TextBlock#PART_TextPresenter">
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+        
+        <Style Selector="TextBox:pointerover /template/ TextBlock#PART_TextPresenter">
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+        
+        <Style Selector="TextBox:focus /template/ TextBlock#PART_TextPresenter">
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+        
+        <!-- Password box fixes -->
+        <Style Selector="TextBox:password /template/ TextBlock#PART_TextPresenter">
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+
+        <Style Selector="TextBox:password:pointerover /template/ TextBlock#PART_TextPresenter">
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+        
+        <!-- ComboBox text fixes -->
+        <Style Selector="ComboBox">
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+        
+        <Style Selector="ComboBoxItem">
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+        
+        <Style Selector="ComboBox /template/ TextBlock">
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+        
+        <!-- Global app styles next -->
+        <StyleInclude Source="/Styles/AppStyles.axaml"/>
+        
+        <!-- Specific section styles last -->
+        <StyleInclude Source="/Styles/HRStyles.axaml"/>
+        
+        <StyleInclude Source="/Styles/EditAddEmployee.axaml"/>
+        
+        
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+
+        <Style Selector="Button.clear-button-orange">
+            <Setter Property="Background" Value="#F97316"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="MinWidth" Value="80"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/> 
+        </Style>
+
+        <Style Selector="Button.clear-button-orange:pointerover">
+            <Setter Property="Background" Value="#EA580C"/>
+        </Style>
+        
+        
+    </Application.Styles>
+    
+    <!-- Application Resources -->
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- Color Resources -->
+            <Color x:Key="PrimaryColor">#3498DB</Color>
+            <Color x:Key="SecondaryColor">#6c757d</Color>
+            <Color x:Key="SuccessColor">#27AE60</Color>
+            <Color x:Key="DangerColor">#dc3545</Color>
+            <Color x:Key="WarningColor">#F39C12</Color>
+            <Color x:Key="InfoColor">#3498DB</Color>
+            <Color x:Key="LightColor">#f8f9fa</Color>
+            <Color x:Key="DarkColor">#343a40</Color>
+            
+            <!-- Converters -->
+            <converters:RoleSelectionConverter x:Key="RoleSelectionConverter"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
