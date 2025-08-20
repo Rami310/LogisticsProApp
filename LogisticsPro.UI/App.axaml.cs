@@ -1,7 +1,9 @@
 using System;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform;
 using LogisticsPro.UI.Infrastructure;
 using LogisticsPro.UI.Services;
 using LogisticsPro.UI.Views;
@@ -26,9 +28,16 @@ public partial class App : Application
         {
             ErrorHandler.TrySafe("AppStartup", () =>
             {
+                // Set global application icon for all windows
+                var iconUri = new Uri("avares://LogisticsPro.UI/Assets/logistics pro text as a logo.jpg");
+                var icon = new WindowIcon(AssetLoader.Open(iconUri));
+
                 // Create the main window
                 var mainWindow = new MainWindow();
 
+                // Set the icon after creating the window
+                mainWindow.Icon = icon;
+                
                 // Initialize navigation service with the main window
                 _navigationService = new NavigationService(mainWindow);
 
