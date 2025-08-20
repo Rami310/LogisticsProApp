@@ -182,7 +182,7 @@
                                         Classes="primary-button"
                                         Margin="10,0,0,0"
                                         Height="35"
-                                        Width="130"
+                                        Width="140"
                                         HorizontalContentAlignment="Center"
                                         Command="{Binding OpenAddProductDialogCommand}"
                                         ToolTip.Tip="Add new product to catalog"/>

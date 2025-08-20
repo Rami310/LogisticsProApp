@@ -2,6 +2,8 @@ using System;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using LogisticsPro.UI.ViewModels;
+using static Avalonia.Controls.DataGrid;
+
 
 namespace LogisticsPro.UI.Views.Logistics.LogisticsManager.Sections
 {

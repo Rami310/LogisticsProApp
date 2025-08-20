@@ -8,6 +8,7 @@ using LogisticsPro.UI.ViewModels;
 using LogisticsPro.UI.Views.HR;
 using System;
 using Avalonia.Threading;
+using static Avalonia.Controls.DataGrid;
 
 namespace LogisticsPro.UI.Views.HR.Sections
 {

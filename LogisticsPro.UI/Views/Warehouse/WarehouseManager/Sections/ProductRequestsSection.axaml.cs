@@ -4,6 +4,8 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using LogisticsPro.UI.Models;
 using LogisticsPro.UI.ViewModels;
+using static Avalonia.Controls.DataGrid;
+
 
 namespace LogisticsPro.UI.Views.Warehouse.WarehouseManager.Sections
 {

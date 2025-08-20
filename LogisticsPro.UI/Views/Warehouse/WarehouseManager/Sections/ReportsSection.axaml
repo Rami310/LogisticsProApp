@@ -6,7 +6,7 @@
              x:DataType="vm:WarehouseManagerDashboardViewModel">
     
     <UserControl.Styles>
-        <!-- Simple card style -->
+        <!-- card style -->
         <Style Selector="Border.metric-card">
             <Setter Property="Background" Value="White"/>
             <Setter Property="BorderBrush" Value="#E5E7EB"/>
@@ -45,7 +45,7 @@
             </StackPanel>
             
             <!-- Simple Metrics Cards Row -->
-                <Grid ColumnDefinitions="*,*,*,*" Height="100" Margin="20,20,20,0">
+                <Grid ColumnDefinitions="*,*,*,*" Height="100" Margin="20,20,20,30">
                     <!-- Budget Card -->
                     <Border Grid.Column="0" Background="#10B981" CornerRadius="10" Margin="0,0,8,0">
                         <StackPanel Margin="18" VerticalAlignment="Center" HorizontalAlignment="Center">
@@ -72,200 +72,7 @@
                             <TextBlock Text="awaiting approval" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Border>
-
-                    <!-- Low Stock Card -->
-                    <Border Grid.Column="3" Background="#E74C3C" CornerRadius="10" Margin="8,0,0,0">
-                        <StackPanel Margin="18" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <TextBlock Text="⚠️ Low Stock Alert" FontSize="14" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                            <TextBlock Text="{Binding LowStockCount, FallbackValue='0'}" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,6,0,0" HorizontalAlignment="Center"/>
-                            <TextBlock Text="items need reorder" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </Border>
                 </Grid>
-            
-             
-            <!-- Recent Sales Table (Updated for Filtering) -->
-            <Border Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="12" Padding="20">
-                <StackPanel>
-                    <!-- Updated Title with Dynamic Month -->
-                    <TextBlock FontSize="18" FontWeight="Bold" Foreground="#1E293B" Margin="0,0,0,15">
-                        <TextBlock.Text>
-                            <MultiBinding StringFormat="🛍️ Sales Transactions for: {0}">
-                                <Binding Path="SelectedMonth"/>
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
-                    
-                    <!-- Updated DataGrid with Filtered Data -->
-                    <DataGrid ItemsSource="{Binding FilteredRecentSales}"
-                              AutoGenerateColumns="False" 
-                              IsReadOnly="True"
-                              CanUserReorderColumns="True"
-                              CanUserResizeColumns="True"
-                              CanUserSortColumns="True"
-                              GridLinesVisibility="Horizontal"
-                              BorderThickness="1"
-                              BorderBrush="#E5E7EB"
-                              Height="250">
-
-                        <!-- Keep all  existing DataGrid.Styles and DataGrid.Columns exactly the same -->
-                        <!-- Just change the ItemsSource from RecentSales to FilteredRecentSales -->
-                        
-                        <DataGrid.Styles>
-                            <Style Selector="DataGridColumnHeader">
-                                <Setter Property="Background" Value="#374151"/>
-                                <Setter Property="Foreground" Value="White"/>
-                                <Setter Property="FontWeight" Value="SemiBold"/>
-                                <Setter Property="Height" Value="40"/>
-                                <Setter Property="Padding" Value="8,0"/>
-                                <Setter Property="FontSize" Value="12"/>
-                            </Style>
-                            
-                            <Style Selector="DataGridRow">
-                                <Setter Property="Background" Value="White"/>
-                                <Setter Property="MinHeight" Value="35"/>
-                            </Style>
-                            
-                            <Style Selector="DataGridRow:pointerover">
-                                <Setter Property="Background" Value="#F9FAFB"/>
-                            </Style>
-                        </DataGrid.Styles>
-
-                        <!-- Keep all existing columns exactly the same -->
-                        <DataGrid.Columns>
-                            <!-- existing columns here -->
-                            <DataGridTextColumn Header="#" Binding="{Binding Id}" Width="50"/>
-                            <DataGridTextColumn Header="Status" Binding="{Binding ProductName}" Width="400"/>
-                            <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="110"/>
-                            
-                            <DataGridTemplateColumn Header="Cost" Width="100">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding Cost, StringFormat='${0:N0}'}" 
-                                                   VerticalAlignment="Center" HorizontalAlignment="Center"
-                                                   Foreground="#DC2626" FontWeight="SemiBold"/>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            
-                            <DataGridTemplateColumn Header="Sold For" Width="110">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding SellingPrice, StringFormat='${0:N0}'}" 
-                                                   VerticalAlignment="Center" HorizontalAlignment="Center"
-                                                   Foreground="#059669" FontWeight="SemiBold"/>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            
-                            <DataGridTemplateColumn Header="Profit" Width="100">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding Profit, StringFormat='${0:N0}'}" 
-                                                   VerticalAlignment="Center" HorizontalAlignment="Center"
-                                                   Foreground="#059669" FontWeight="Bold"/>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            
-                            <DataGridTemplateColumn Header="Date"  Width="80" >
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding SaleDate, StringFormat='{}{0:MM-dd HH:mm}'}" 
-                                                   VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="11"/>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            </DataGrid.Columns>
-                    </DataGrid>
-                </StackPanel>
-            </Border>
-            
-            
-            <!-- Month Filter Section -->
-            <Border Background="White" BorderBrush="#3B82F6" BorderThickness="2" CornerRadius="8" Padding="20">
-                <Grid ColumnDefinitions="*,Auto">
-                    <StackPanel Grid.Column="0">
-                        <TextBlock Text="🗓️ Monthly Filter" FontSize="16" FontWeight="Bold" Foreground="#1E293B" Margin="0,0,0,5"/>
-                        <TextBlock Text="Select a month to filter your reports data" FontSize="12" Foreground="#64748B"/>
-                    </StackPanel>
-                    
-                    <ComboBox Grid.Column="1"
-                              ItemsSource="{Binding AvailableMonths}"
-                              SelectedItem="{Binding SelectedMonth}"
-                              Width="200"
-                              Height="35"
-                              Background="White"
-                              BorderBrush="#3B82F6"
-                              BorderThickness="1"
-                              CornerRadius="6"
-                              Padding="10,8"
-                              FontSize="13"
-                              FontWeight="SemiBold"
-                              PlaceholderText="Select month...">
-                        
-                        <ComboBox.Styles>
-                            <Style Selector="ComboBox /template/ ContentPresenter#PART_ContentPresenter">
-                                <Setter Property="Foreground" Value="#1E293B"/>
-                            </Style>
-                            <Style Selector="ComboBoxItem">
-                                <Setter Property="Background" Value="White"/>
-                                <Setter Property="Foreground" Value="#1E293B"/>
-                                <Setter Property="Padding" Value="10,8"/>
-                            </Style>
-                            <Style Selector="ComboBoxItem:pointerover">
-                                <Setter Property="Background" Value="#EFF6FF"/>
-                                <Setter Property="Foreground" Value="#1E293B"/>
-                            </Style>
-                            <Style Selector="ComboBoxItem:selected">
-                                <Setter Property="Background" Value="#3B82F6"/>
-                                <Setter Property="Foreground" Value="White"/>
-                            </Style>
-                        </ComboBox.Styles>
-                    </ComboBox>
-                </Grid>
-            </Border>
-            
-            <!-- Filtered Metrics Cards -->
-            <Border Background="#EFF6FF" BorderBrush="#3B82F6" BorderThickness="1" CornerRadius="12" Padding="15">
-                <StackPanel>
-                    <TextBlock Text="{Binding SelectedMonth, StringFormat='📊 Filtered Results for: {0}'}" 
-                               FontSize="16" FontWeight="Bold" Foreground="#1E40AF" 
-                               HorizontalAlignment="Center" Margin="0,0,0,15"/>
-                    
-                    <Grid ColumnDefinitions="*,*,*" Height="100">
-                        <!-- Filtered Profit -->
-                        <Border Grid.Column="0" Background="White" CornerRadius="8" Padding="15" Margin="0,0,8,0">
-                            <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="💰 Filtered Profit" FontSize="12" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,0,5"/>
-                                <TextBlock Text="{Binding FilteredProfit, StringFormat='${0:N0}', FallbackValue='$0'}" 
-                                           FontSize="22" FontWeight="Bold" Foreground="#059669" HorizontalAlignment="Center"/>
-                                <TextBlock Text="from selected period" FontSize="10" Foreground="#9CA3AF" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Border>
-                        
-                        <!-- Filtered Sales -->
-                        <Border Grid.Column="1" Background="White" CornerRadius="8" Padding="15" Margin="4,0">
-                            <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="📈 Filtered Sales" FontSize="12" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,0,5"/>
-                                <TextBlock Text="{Binding FilteredSales, FallbackValue='0'}" 
-                                           FontSize="22" FontWeight="Bold" Foreground="#3B82F6" HorizontalAlignment="Center"/>
-                                <TextBlock Text="transactions found" FontSize="10" Foreground="#9CA3AF" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Border>
-                        
-                        <!-- Filtered Average -->
-                        <Border Grid.Column="2" Background="White" CornerRadius="8" Padding="15" Margin="8,0,0,0">
-                            <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="📊 Filtered Avg/Sale" FontSize="12" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,0,5"/>
-                                <TextBlock Text="{Binding FilteredAveragePerSale, StringFormat='${0:N0}', FallbackValue='$0'}" 
-                                           FontSize="22" FontWeight="Bold" Foreground="#EAB308" HorizontalAlignment="Center"/>
-                                <TextBlock Text="per transaction" FontSize="10" Foreground="#9CA3AF" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Border>
-                    </Grid>
-                </StackPanel>
-            </Border>
             
             
             <!-- Monthly Profit Chart Section -->
