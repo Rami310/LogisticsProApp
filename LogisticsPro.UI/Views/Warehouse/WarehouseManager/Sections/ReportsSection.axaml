@@ -41,52 +41,47 @@
             <!-- Header -->
             <StackPanel>
                 <TextBlock Text="📊 Sales &amp; Profit Reports" FontSize="24" FontWeight="Bold" Foreground="#1E293B"/>
-                <TextBlock Text="Basic profit and sales analysis from your API data" FontSize="14" Foreground="#64748B"/>
+                <TextBlock Text="Basic profit and sales analysis from API data" FontSize="14" Foreground="#64748B"/>
             </StackPanel>
             
             <!-- Simple Metrics Cards Row -->
-            <Grid ColumnDefinitions="*,*,*,*" Height="120">
-                
-                <!-- Total Profit This Month -->
-                <Border Grid.Column="0" Classes="metric-card">
-                    <StackPanel>
-                        <TextBlock Text="💰 Total Profit (This Month)" Classes="metric-title"/>
-                        <TextBlock Text="{Binding TotalProfitThisMonth, StringFormat='${0:N0}', FallbackValue='$0'}" 
-                                   Classes="metric-value" Foreground="#059669"/>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding ProfitGrowthPercentage, StringFormat='{}{0:F1}%', FallbackValue='0%'}" 
-                                       FontSize="12" FontWeight="SemiBold" Margin="0,0,4,0"
-                                       Foreground="#059669"/>
-                            <TextBlock Text="vs last month" Classes="metric-subtitle"/>
+                <Grid ColumnDefinitions="*,*,*,*" Height="100" Margin="20,20,20,0">
+                    <!-- Budget Card -->
+                    <Border Grid.Column="0" Background="#10B981" CornerRadius="10" Margin="0,0,8,0">
+                        <StackPanel Margin="18" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="💰 Available Budget" FontSize="14" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding AvailableBudgetDisplayK, FallbackValue='$1,200K'}" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,6,0,0" HorizontalAlignment="Center"/>
+                            <TextBlock Text="company funds" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
                         </StackPanel>
-                    </StackPanel>
-                </Border>
-                
-                <!-- Sales Count This Month -->
-                <Border Grid.Column="1" Classes="metric-card">
-                    <StackPanel>
-                        <TextBlock Text="📈 Sales Count (This Month)" Classes="metric-title"/>
-                        <TextBlock Text="{Binding TotalSalesThisMonth, FallbackValue='0'}" 
-                                   Classes="metric-value" Foreground="#3B82F6"/>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding SalesGrowthPercentage, StringFormat='{}{0:F1}%', FallbackValue='0%'}" 
-                                       FontSize="12" FontWeight="SemiBold" Margin="0,0,4,0"
-                                       Foreground="#3B82F6"/>
-                            <TextBlock Text="vs last month" Classes="metric-subtitle"/>
+                    </Border>
+
+                    <!-- Stock Card -->
+                    <Border Grid.Column="1" Background="#3B82F6" CornerRadius="10" Margin="4,0">
+                        <StackPanel Margin="18" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="📦 Total Stock" FontSize="14" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding TotalStockQuantity, FallbackValue='38,531'}" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,6,0,0" HorizontalAlignment="Center"/>
+                            <TextBlock Text="items in inventory" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
                         </StackPanel>
-                    </StackPanel>
-                </Border>
-                
-                <!-- Average Profit Per Sale -->
-                <Border Grid.Column="2" Classes="metric-card">
-                    <StackPanel>
-                        <TextBlock Text="📊 Average Profit/Sale" Classes="metric-title"/>
-                        <TextBlock Text="{Binding AverageProfitPerSale, StringFormat='${0:N0}', FallbackValue='$0'}" 
-                                   Classes="metric-value" Foreground="#EAB308"/>
-                        <TextBlock Text="per transaction" Classes="metric-subtitle"/>
-                    </StackPanel>
-                </Border>
-            </Grid>
+                    </Border>
+
+                    <!-- Pending Card -->
+                    <Border Grid.Column="2" Background="#F59E0B" CornerRadius="10" Margin="4,0">
+                        <StackPanel Margin="18" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="⏳ Pending Orders" FontSize="14" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding PendingRequestsCount, FallbackValue='6'}" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,6,0,0" HorizontalAlignment="Center"/>
+                            <TextBlock Text="awaiting approval" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Low Stock Card -->
+                    <Border Grid.Column="3" Background="#E74C3C" CornerRadius="10" Margin="8,0,0,0">
+                        <StackPanel Margin="18" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="⚠️ Low Stock Alert" FontSize="14" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding LowStockCount, FallbackValue='0'}" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,6,0,0" HorizontalAlignment="Center"/>
+                            <TextBlock Text="items need reorder" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
             
              
             <!-- Recent Sales Table (Updated for Filtering) -->
@@ -105,12 +100,15 @@
                     <DataGrid ItemsSource="{Binding FilteredRecentSales}"
                               AutoGenerateColumns="False" 
                               IsReadOnly="True"
+                              CanUserReorderColumns="True"
+                              CanUserResizeColumns="True"
+                              CanUserSortColumns="True"
                               GridLinesVisibility="Horizontal"
                               BorderThickness="1"
                               BorderBrush="#E5E7EB"
                               Height="250">
 
-                        <!-- Keep all your existing DataGrid.Styles and DataGrid.Columns exactly the same -->
+                        <!-- Keep all  existing DataGrid.Styles and DataGrid.Columns exactly the same -->
                         <!-- Just change the ItemsSource from RecentSales to FilteredRecentSales -->
                         
                         <DataGrid.Styles>
@@ -133,14 +131,14 @@
                             </Style>
                         </DataGrid.Styles>
 
-                        <!-- Keep all your existing columns exactly the same -->
+                        <!-- Keep all existing columns exactly the same -->
                         <DataGrid.Columns>
-                            <!-- Your existing columns here - don't change them -->
-                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
-                            <DataGridTextColumn Header="Product" Binding="{Binding ProductName}" Width="200"/>
-                            <DataGridTextColumn Header="Qty" Binding="{Binding Quantity}" Width="60"/>
+                            <!-- existing columns here -->
+                            <DataGridTextColumn Header="#" Binding="{Binding Id}" Width="50"/>
+                            <DataGridTextColumn Header="Status" Binding="{Binding ProductName}" Width="400"/>
+                            <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="110"/>
                             
-                            <DataGridTemplateColumn Header="Cost" Width="80">
+                            <DataGridTemplateColumn Header="Cost" Width="100">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding Cost, StringFormat='${0:N0}'}" 
@@ -150,7 +148,7 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             
-                            <DataGridTemplateColumn Header="Sold For" Width="90">
+                            <DataGridTemplateColumn Header="Sold For" Width="110">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding SellingPrice, StringFormat='${0:N0}'}" 
@@ -160,7 +158,7 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             
-                            <DataGridTemplateColumn Header="Profit" Width="80">
+                            <DataGridTemplateColumn Header="Profit" Width="100">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding Profit, StringFormat='${0:N0}'}" 
@@ -170,17 +168,15 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             
-                            <DataGridTemplateColumn Header="Date" Width="80">
+                            <DataGridTemplateColumn Header="Date"  Width="80" >
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding SaleDate, StringFormat='{}{0:MM/dd}'}" 
+                                        <TextBlock Text="{Binding SaleDate, StringFormat='{}{0:MM-dd HH:mm}'}" 
                                                    VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="11"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            
-                            <DataGridTextColumn Header="Sold By" Binding="{Binding SoldBy}" Width="*"/>
-                        </DataGrid.Columns>
+                            </DataGrid.Columns>
                     </DataGrid>
                 </StackPanel>
             </Border>
@@ -311,7 +307,7 @@
                     </Border>
                     
                     <!-- Chart Info -->
-                    <TextBlock Text="💡 Chart shows profit trends over the last 6 months. Data updates automatically from your API transactions." 
+                    <TextBlock Text="💡 Chart shows profit trends over the last 6 months. Data updates automatically from API transactions." 
                                FontSize="12" 
                                Foreground="#64748B" 
                                Margin="0,10,0,0"

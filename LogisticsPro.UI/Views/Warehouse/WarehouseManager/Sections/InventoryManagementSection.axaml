@@ -178,7 +178,7 @@
                     
                                 <!-- Add Product button -->
                                 <Button Grid.Column="2"
-                                        Content="➕Add Product"
+                                        Content="➕ Add Product"
                                         Classes="primary-button"
                                         Margin="10,0,0,0"
                                         Height="35"
