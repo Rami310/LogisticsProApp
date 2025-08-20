@@ -23,34 +23,27 @@ namespace LogisticsPro.UI.ViewModels
     public partial class WarehouseManagerDashboardViewModel : BaseDashboardViewModel
     {
         // ========================================
-        // EXISTING PROPERTIES
+        // CORE PROPERTIES
         // ========================================
         [ObservableProperty] private ObservableCollection<InventoryItem> _inventoryItems;
-
         [ObservableProperty] private ObservableCollection<ProductRequest> _pendingRequests;
-
         [ObservableProperty] private ObservableCollection<InventoryItem> _lowStockItems;
-
         [ObservableProperty] private bool _isLoading;
-
         [ObservableProperty] private bool _isRequestDialogOpen;
-
         [ObservableProperty] private ProductRequest _newRequest = new ProductRequest();
-
         [ObservableProperty] private Product? _selectedProduct;
-
         [ObservableProperty] private ObservableCollection<Product> _products;
-
         [ObservableProperty] private string _currentSection = "Dashboard";
-
         [ObservableProperty] private Control? _currentSectionView;
-
         [ObservableProperty] private BaseRevenueViewModel _revenueViewModel;
 
         private List<InventoryItem> _allInventoryItems = new List<InventoryItem>();
         
         public string WelcomeMessage => $"Welcome to Warehouse Dashboard, {Username}!";
         
+        // ========================================
+        // REPORTING & CHARTS PROPERTIES
+        // ========================================
         [ObservableProperty] private decimal _totalProfitThisMonth;
         [ObservableProperty] private decimal _totalProfitLastMonth;
         [ObservableProperty] private int _totalSalesThisMonth;
@@ -72,35 +65,190 @@ namespace LogisticsPro.UI.ViewModels
         [ObservableProperty] private Axis[] _profitChartYAxes;
 
         // ========================================
-        // PROPERTIES FOR PRODUCT REQUESTS SECTION
+        // PRODUCT REQUESTS PROPERTIES
         // ========================================
         [ObservableProperty] private ObservableCollection<ProductRequest> _allRequests;
-
         [ObservableProperty] private int _approvedRequestsCount;
-
         [ObservableProperty] private int _totalRequestsThisMonth;
-
         [ObservableProperty] private decimal _totalSpentOnRequests;
-
         [ObservableProperty] private decimal _totalCost;
-
         [ObservableProperty] private decimal _budgetAfterOrder;
-
-
         [ObservableProperty] private int _currentRequestPage = 1;
-
         [ObservableProperty] private int _itemsPerRequestPage = 10;
-
         [ObservableProperty] private int _totalRequestPages = 1;
-
         [ObservableProperty] private ObservableCollection<ProductRequest> _paginatedRequests = new();
-        
-        [RelayCommand]
-        private void ClearSearch()
+
+        // ========================================
+        // PRODUCT MANAGEMENT PROPERTIES
+        // ========================================
+        [ObservableProperty] private bool _isAddProductDialogOpen;
+        [ObservableProperty] private Product _newProduct = new Product();
+        [ObservableProperty] private string _unitPriceText = "";
+
+        // ========================================
+        // SEARCH & NAVIGATION PROPERTIES
+        // ========================================
+        private string _searchText = "";
+        private bool _isFiltering = false;
+        private string _quantityText = "1";
+
+        public string SearchText
         {
-            SearchText = "";
+            get => _searchText;
+            set
+            {
+                Console.WriteLine($"SearchText setter called with: '{value}'");
+
+                if (SetProperty(ref _searchText, value) && !_isFiltering)
+                {
+                    _isFiltering = true;
+                    try
+                    {
+                        Console.WriteLine($"About to call FilterInventory with: '{value}'");
+                        FilterInventory();
+                        Console.WriteLine($"FilterInventory completed");
+                    }
+                    finally
+                    {
+                        _isFiltering = false;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"FilterInventory NOT called - isFiltering: {_isFiltering}");
+                }
+            }
+        }
+
+        public string QuantityText
+        {
+            get => _quantityText;
+            set
+            {
+                if (SetProperty(ref _quantityText, value))
+                {
+                    // Convert to int and update NewRequest.RequestedQuantity
+                    if (int.TryParse(value, out int quantity) && quantity > 0)
+                    {
+                        if (NewRequest != null)
+                        {
+                            NewRequest.RequestedQuantity = quantity;
+                            UpdateCostCalculation();
+                        }
+                    }
+                    else if (string.IsNullOrWhiteSpace(value))
+                    {
+                        // Allow empty for better UX - don't show error immediately
+                        if (NewRequest != null)
+                        {
+                            NewRequest.RequestedQuantity = 1; // Default to 1
+                            UpdateCostCalculation();
+                        }
+                    }
+                }
+            }
+        }
+
+        // ========================================
+        // COMPUTED PROPERTIES
+        // ========================================
+        public bool CanGoPrevious => CurrentRequestPage > 1;
+        public bool CanGoNext => CurrentRequestPage < TotalRequestPages;
+
+        /// <summary>
+        /// Gets the total quantity of all inventory items (sum of all stock)
+        /// </summary>
+        public int TotalStockQuantity
+        {
+            get
+            {
+                if (InventoryItems == null || !InventoryItems.Any())
+                    return 0;
+            
+                return InventoryItems.Sum(item => item.QuantityInStock);
+            }
         }
         
+        /// <summary>
+        /// Gets the available budget formatted as "901K" style
+        /// </summary>
+        public string AvailableBudgetDisplayK
+        {
+            get
+            {
+                if (RevenueViewModel?.AvailableBudget == null)
+                    return "$0K";
+            
+                var budget = RevenueViewModel.AvailableBudget;
+                var budgetInK = Math.Round(budget / 1000, 0);
+                return $"${budgetInK:F0}K";
+            }
+        }
+
+        // Dropdown collections for product management
+        public List<string> AvailableCategories { get; } = new()
+        {
+            "Packaging", "Equipment", "Stationery", "Safety", "Tools", "Office Supplies"
+        };
+
+        public List<string> AvailableUnits { get; } = new()
+        {
+            "Each", "Pack", "Roll", "Box", "Case", "Pallet"
+        };
+
+        public List<string> AvailableSuppliers { get; } = new()
+        {
+            "PackWell Inc.", "SafePack", "Heavy Lifters Co.", "OfficeMart", "PowerLift", "Industrial Supply Co."
+        };
+
+        // ========================================
+        // CONSTRUCTOR
+        // ========================================
+        public WarehouseManagerDashboardViewModel(Action navigateToLogin, string username)
+            : base(navigateToLogin, username, "Warehouse Dashboard")
+        {
+            // Store the chart service
+            _chartService = ServiceLocator.Get<IChartService>();
+            
+            // Initialize revenue section
+            RevenueViewModel = new BaseRevenueViewModel("Warehouse Manager");
+
+            // Initialize ObservableCollections
+            InventoryItems = new ObservableCollection<InventoryItem>();
+            PendingRequests = new ObservableCollection<ProductRequest>();
+            LowStockItems = new ObservableCollection<InventoryItem>();
+            Products = new ObservableCollection<Product>();
+            AllRequests = new ObservableCollection<ProductRequest>();
+
+            // Initialize NewRequest with property change monitoring
+            NewRequest = new ProductRequest
+            {
+                RequestedBy = username,
+                RequestDate = DateTime.Now,
+                RequestedQuantity = 1
+            };
+            
+            // Initialize chart properties
+            InitializeChartPropertiesUsingService();
+
+            // Load data
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(500);
+                try
+                {
+                    await LoadDashboardDataAsync();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Dashboard loading failed: {ex.Message}");
+                }
+            });
+        }
+
+        // ========================================
+        // CHART INITIALIZATION
+        // ========================================
         /// <summary>
         /// Initialize chart properties using the chart service
         /// </summary>
@@ -113,7 +261,214 @@ namespace LogisticsPro.UI.ViewModels
     
             Console.WriteLine("Chart properties initialized using service");
         }
-        
+
+        // ========================================
+        // NAVIGATION COMMANDS
+        // ========================================
+        [RelayCommand]
+        private void NavigateToSection(string section)
+        {
+            CurrentSection = section;
+
+            switch (section)
+            {
+                case "Dashboard":
+                    CurrentSectionView = null; // Show main dashboard
+                    break;
+
+                case "InventoryCheck":
+                    CurrentSectionView = new InventoryManagementSection
+                    {
+                        DataContext = this
+                    };
+                    break;
+
+                case "ProductRequests":
+                    CurrentSectionView = new ProductRequestsSection
+                    {
+                        DataContext = this
+                    };
+                    break;
+
+                case "Reports":
+                    CurrentSectionView = new ReportsSection
+                    {
+                        DataContext = this
+                    };
+                    // Load reports data when navigating
+                    _ = Task.Run(LoadBasicReportsDataAsync);
+                    break;
+
+                case "StockTransfers":
+                case "LowStock":
+                    CurrentSectionView = new InventoryManagementSection
+                    {
+                        DataContext = this
+                    };
+                    break;
+
+                default:
+                    CurrentSectionView = null;
+                    break;
+            }
+
+            Console.WriteLine(
+                $"Navigated to {section} - CurrentSectionView: {CurrentSectionView?.GetType().Name ?? "Dashboard"}");
+        }
+
+        // ========================================
+        // DATA LOADING METHODS
+        // ========================================
+        private async Task LoadDashboardDataAsync()
+        {
+            Console.WriteLine("LoadDashboardDataAsync started");
+            IsLoading = true;
+
+            try
+            {
+                await ErrorHandler.TrySafeAsync("LoadWarehouseDashboard", async () =>
+                {
+                    Console.WriteLine("Loading warehouse dashboard data...");
+
+                    // Get all inventory items (ASYNC)
+                    var inventory = await InventoryService.GetAllInventoryAsync();
+                    Console.WriteLine($"Loaded {inventory.Count} inventory items");
+
+                    // Get pending requests (ASYNC)
+                    var requests = await ProductRequestService.GetRequestsByStatusAsync("Pending");
+                    Console.WriteLine($"Loaded {requests.Count} pending requests");
+
+                    // Calculate low stock items with threshold of 10
+                    var lowStock = inventory.Where(item => item.QuantityInStock < 10).ToList();
+                    Console.WriteLine($"Found {lowStock.Count} low stock items (threshold: 10)");
+
+                    // Get all products (ASYNC)
+                    var products = await ProductService.GetAllProductsAsync();
+                    Console.WriteLine($"Loaded {products.Count} products");
+
+                    // Load all requests for the requests section
+                    await LoadAllRequestsAsync();
+
+                    // Update collections ON UI THREAD
+                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        Console.WriteLine("Updating UI collections...");
+
+                        // Clear and populate inventory
+                        _allInventoryItems = inventory.ToList();
+                        InventoryItems.Clear();
+                        foreach (var item in inventory)
+                        {
+                            InventoryItems.Add(item);
+                        }
+
+                        // Clear and populate pending requests
+                        PendingRequests.Clear();
+                        foreach (var request in requests)
+                        {
+                            PendingRequests.Add(request);
+                        }
+
+                        // Clear and populate low stock items with real data
+                        LowStockItems.Clear();
+                        foreach (var item in lowStock)
+                        {
+                            LowStockItems.Add(item);
+                        }
+
+                        // Clear and populate products
+                        Products.Clear();
+                        foreach (var product in products)
+                        {
+                            Products.Add(product);
+                        }
+
+                        Console.WriteLine(
+                            $"UI Updated - Inventory: {InventoryItems.Count}, Requests: {PendingRequests.Count}, Low Stock: {LowStockItems.Count}, Products: {Products.Count}");
+
+                        // Debug low stock items
+                        foreach (var item in LowStockItems)
+                        {
+                            Console.WriteLine($"Low Stock: {item.Product?.Name} - Stock: {item.QuantityInStock}");
+                        }
+                        OnPropertyChanged(nameof(TotalStockQuantity));
+                        OnPropertyChanged(nameof(AvailableBudgetDisplayK));
+
+                    });
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"LoadDashboardDataAsync error: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
+                Console.WriteLine("LoadDashboardDataAsync completed");
+            }
+        }
+
+        private async Task LoadAllRequestsAsync()
+        {
+            try
+            {
+                // Get all requests for this manager
+                var allRequests = await ProductRequestService.GetRequestsByUserAsync(Username);
+
+                // Update UI on main thread
+                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    // Sort by newest first (by RequestDate, then by database ID)
+                    var sortedRequests = allRequests
+                        .OrderByDescending(r => r.RequestDate) // Newest date first
+                        .ThenByDescending(r => r.Id) // Then highest database ID first
+                        .ToList();
+
+                    // Assign UI Display IDs (1, 2, 3...) to the sorted list
+                    for (int i = 0; i < sortedRequests.Count; i++)
+                    {
+                        sortedRequests[i].DisplayId = i + 1; // Display ID starts from 1 for newest
+                    }
+
+                    AllRequests = new ObservableCollection<ProductRequest>(sortedRequests);
+
+                    // Update statistics (using original data, not display IDs)
+                    ApprovedRequestsCount = allRequests.Count(r => r.RequestStatus == "Approved");
+                    TotalRequestsThisMonth = allRequests.Count(r => r.RequestDate.Month == DateTime.Now.Month);
+                    TotalSpentOnRequests = allRequests
+                        .Where(r => r.RequestStatus != "Rejected" && r.RequestStatus != "Cancelled")
+                        .Sum(r => r.TotalCost);
+
+                    // Update pagination after loading data
+                    UpdateRequestsPagination();
+
+                    // Update revenue section with order progress
+                    UpdateRevenueOrderProgress();
+                });
+
+                Console.WriteLine(
+                    $"Loaded {allRequests.Count} total requests for {Username} (newest = Display ID 1)");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to load all requests: {ex.Message}");
+
+                // Fallback to empty collection
+                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    AllRequests = new ObservableCollection<ProductRequest>();
+                    ApprovedRequestsCount = 0;
+                    TotalRequestsThisMonth = 0;
+                    TotalSpentOnRequests = 0;
+                    UpdateRequestsPagination();
+                    UpdateRevenueOrderProgress();
+                });
+            }
+        }
+
+        // ========================================
+        // REPORTS DATA LOADING
+        // ========================================
         private async Task LoadBasicReportsDataAsync()
         {
             Console.WriteLine("Loading basic reports data...");
@@ -140,11 +495,8 @@ namespace LogisticsPro.UI.ViewModels
         
                 // Also load recent sales
                 await LoadRecentSalesAsync();
-                
                 await LoadAvailableMonthsAsync();
-        
                 await FilterBySelectedMonthAsync();
-                
                 await PrepareMonthlyProfitChartAsync();
 
             }
@@ -404,32 +756,6 @@ namespace LogisticsPro.UI.ViewModels
             }
         }
 
-        // Helper methods
-        private string ExtractProductNameFromDescription(string description)
-        {
-            if (string.IsNullOrEmpty(description)) return "Unknown Product";
-    
-            // Handle your API description format: "Product Name delivery confirmed"
-            if (description.Contains("delivery confirmed"))
-            {
-                return description.Replace(" delivery confirmed", "").Trim();
-            }
-    
-            return description;
-        }
-
-        private decimal CalculateCostFromProfit(decimal profit)
-        {
-            // Assuming 50% profit margin: if profit = $500, then cost = $1000
-            return profit * 2;
-        }
-
-        private decimal CalculateSellingPriceFromProfit(decimal profit)
-        {
-            // Selling price = cost + profit = (profit * 2) + profit = profit * 3
-            return profit * 3;
-        }
-
         /// <summary>
         /// Prepare chart using the chart service
         /// </summary>
@@ -457,268 +783,15 @@ namespace LogisticsPro.UI.ViewModels
                 Console.WriteLine($"Error preparing chart using service: {ex.Message}");
             }
         }
-        
-        // Property change handler for month selection
-        partial void OnSelectedMonthChanged(string value)
-        {
-            Console.WriteLine($"Month changed to: {value}");
-            _ = Task.Run(FilterBySelectedMonthAsync);
-        }
-        
-        public bool CanGoPrevious => CurrentRequestPage > 1;
-        public bool CanGoNext => CurrentRequestPage < TotalRequestPages;
 
         // ========================================
-        // NAVIGATION
+        // BASIC INVENTORY COMMANDS
         // ========================================
         [RelayCommand]
-        private void NavigateToSection(string section)
+        private void ClearSearch()
         {
-            CurrentSection = section;
-
-            switch (section)
-            {
-                case "Dashboard":
-                    CurrentSectionView = null; // Show main dashboard
-                    break;
-
-                case "InventoryCheck":
-                    CurrentSectionView = new InventoryManagementSection
-                    {
-                        DataContext = this
-                    };
-                    break;
-
-                case "ProductRequests":
-                    CurrentSectionView = new ProductRequestsSection
-                    {
-                        DataContext = this
-                    };
-                    break;
-
-                case "Reports":
-                    CurrentSectionView = new ReportsSection
-                    {
-                        DataContext = this
-                    };
-                    // Load reports data when navigating
-                    _ = Task.Run(LoadBasicReportsDataAsync);
-                    break;
-
-                case "StockTransfers":
-                case "LowStock":
-                    CurrentSectionView = new InventoryManagementSection
-                    {
-                        DataContext = this
-                    };
-                    break;
-
-                default:
-                    CurrentSectionView = null;
-                    break;
-            }
-
-            Console.WriteLine(
-                $"Navigated to {section} - CurrentSectionView: {CurrentSectionView?.GetType().Name ?? "Dashboard"}");
+            SearchText = "";
         }
-
-        // ========================================
-        // CONSTRUCTOR
-        // ========================================
-        public WarehouseManagerDashboardViewModel(Action navigateToLogin, string username)
-            : base(navigateToLogin, username, "Warehouse Dashboard")
-        {
-            // Store the service
-            _chartService = ServiceLocator.Get<IChartService>();
-            
-            // Initialize revenue section
-            RevenueViewModel = new BaseRevenueViewModel("Warehouse Manager");
-
-            // Initialize ObservableCollections
-            InventoryItems = new ObservableCollection<InventoryItem>();
-            PendingRequests = new ObservableCollection<ProductRequest>();
-            LowStockItems = new ObservableCollection<InventoryItem>();
-            Products = new ObservableCollection<Product>();
-            AllRequests = new ObservableCollection<ProductRequest>();
-
-            // Initialize NewRequest with property change monitoring
-            NewRequest = new ProductRequest
-            {
-                RequestedBy = username,
-                RequestDate = DateTime.Now,
-                RequestedQuantity = 1
-            };
-            
-            InitializeChartPropertiesUsingService();
-
-            // Load data
-            _ = Task.Run(async () =>
-            {
-                await Task.Delay(500);
-                try
-                {
-                    await LoadDashboardDataAsync();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Dashboard loading failed: {ex.Message}");
-                }
-            });
-        }
-
-        // ========================================
-        // DATA LOADING
-        // ========================================
-        private async Task LoadDashboardDataAsync()
-        {
-            Console.WriteLine("LoadDashboardDataAsync started");
-            IsLoading = true;
-
-            try
-            {
-                await ErrorHandler.TrySafeAsync("LoadWarehouseDashboard", async () =>
-                {
-                    Console.WriteLine("Loading warehouse dashboard data...");
-
-                    // Get all inventory items (ASYNC)
-                    var inventory = await InventoryService.GetAllInventoryAsync();
-                    Console.WriteLine($"Loaded {inventory.Count} inventory items");
-
-                    // Get pending requests (ASYNC)
-                    var requests = await ProductRequestService.GetRequestsByStatusAsync("Pending");
-                    Console.WriteLine($"Loaded {requests.Count} pending requests");
-
-                    // Calculate low stock items with threshold of 10
-                    var lowStock = inventory.Where(item => item.QuantityInStock < 10).ToList();
-                    Console.WriteLine($"Found {lowStock.Count} low stock items (threshold: 10)");
-
-                    // Get all products (ASYNC)
-                    var products = await ProductService.GetAllProductsAsync();
-                    Console.WriteLine($"Loaded {products.Count} products");
-
-                    // Load all requests for the requests section
-                    await LoadAllRequestsAsync();
-
-                    // Update collections ON UI THREAD
-                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        Console.WriteLine("Updating UI collections...");
-
-                        // Clear and populate inventory
-                        _allInventoryItems = inventory.ToList();
-                        InventoryItems.Clear();
-                        foreach (var item in inventory)
-                        {
-                            InventoryItems.Add(item);
-                        }
-
-                        // Clear and populate pending requests
-                        PendingRequests.Clear();
-                        foreach (var request in requests)
-                        {
-                            PendingRequests.Add(request);
-                        }
-
-                        // Clear and populate low stock items with real data
-                        LowStockItems.Clear();
-                        foreach (var item in lowStock)
-                        {
-                            LowStockItems.Add(item);
-                        }
-
-                        // Clear and populate products
-                        Products.Clear();
-                        foreach (var product in products)
-                        {
-                            Products.Add(product);
-                        }
-
-                        Console.WriteLine(
-                            $"UI Updated - Inventory: {InventoryItems.Count}, Requests: {PendingRequests.Count}, Low Stock: {LowStockItems.Count}, Products: {Products.Count}");
-
-                        // Debug low stock items
-                        foreach (var item in LowStockItems)
-                        {
-                            Console.WriteLine($"Low Stock: {item.Product?.Name} - Stock: {item.QuantityInStock}");
-                        }
-                        OnPropertyChanged(nameof(TotalStockQuantity));
-                        OnPropertyChanged(nameof(AvailableBudgetDisplayK));
-
-                    });
-                });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"LoadDashboardDataAsync error: {ex.Message}");
-            }
-            finally
-            {
-                IsLoading = false;
-                Console.WriteLine("LoadDashboardDataAsync completed");
-            }
-        }
-
-        private async Task LoadAllRequestsAsync()
-        {
-            try
-            {
-                // Get all requests for this manager
-                var allRequests = await ProductRequestService.GetRequestsByUserAsync(Username);
-
-                // Update UI on main thread
-                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    // Sort by newest first (by RequestDate, then by database ID)
-                    var sortedRequests = allRequests
-                        .OrderByDescending(r => r.RequestDate) // Newest date first
-                        .ThenByDescending(r => r.Id) // Then highest database ID first
-                        .ToList();
-
-                    // Assign UI Display IDs (1, 2, 3...) to the sorted list
-                    for (int i = 0; i < sortedRequests.Count; i++)
-                    {
-                        sortedRequests[i].DisplayId = i + 1; // Display ID starts from 1 for newest
-                    }
-
-                    AllRequests = new ObservableCollection<ProductRequest>(sortedRequests);
-
-                    // Update statistics (using original data, not display IDs)
-                    ApprovedRequestsCount = allRequests.Count(r => r.RequestStatus == "Approved");
-                    TotalRequestsThisMonth = allRequests.Count(r => r.RequestDate.Month == DateTime.Now.Month);
-                    TotalSpentOnRequests = allRequests
-                        .Where(r => r.RequestStatus != "Rejected" && r.RequestStatus != "Cancelled")
-                        .Sum(r => r.TotalCost);
-
-                    // Update pagination after loading data
-                    UpdateRequestsPagination();
-
-                    // Update revenue section with order progress
-                    UpdateRevenueOrderProgress();
-                });
-
-                Console.WriteLine(
-                    $"Loaded {allRequests.Count} total requests for {Username} (newest = Display ID 1)");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to load all requests: {ex.Message}");
-
-                // Fallback to empty collection
-                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    AllRequests = new ObservableCollection<ProductRequest>();
-                    ApprovedRequestsCount = 0;
-                    TotalRequestsThisMonth = 0;
-                    TotalSpentOnRequests = 0;
-                    UpdateRequestsPagination();
-                    UpdateRevenueOrderProgress();
-                });
-            }
-        }
-
-        // ========================================
-        // EXISTING COMMANDS (from your working version)
-        // ========================================
 
         [RelayCommand]
         private void FilterInventory()
@@ -750,15 +823,24 @@ namespace LogisticsPro.UI.ViewModels
         }
 
         [RelayCommand]
+        private async Task RefreshDataAsync()
+        {
+            await LoadDashboardDataAsync();
+        }
+
+        // ========================================
+        // PRODUCT REQUEST DIALOG COMMANDS
+        // ========================================
+        [RelayCommand]
         private void OpenRequestDialog()
         {
             // Create fresh request instance
-                NewRequest = new ProductRequest
-                {
-                    RequestedBy = Username,
-                    RequestDate = DateTime.Now,
-                    RequestedQuantity = 1
-                };
+            NewRequest = new ProductRequest
+            {
+                RequestedBy = Username,
+                RequestDate = DateTime.Now,
+                RequestedQuantity = 1
+            };
 
             // Reset selections and text
             SelectedProduct = null;
@@ -834,14 +916,8 @@ namespace LogisticsPro.UI.ViewModels
             });
         }
 
-        [RelayCommand]
-        private async Task RefreshDataAsync()
-        {
-            await LoadDashboardDataAsync();
-        }
-
         // ========================================
-        // NEW COMMANDS FOR PRODUCT REQUESTS SECTION
+        // PRODUCT REQUEST MANAGEMENT COMMANDS
         // ========================================
         [RelayCommand]
         private void FilterRequests()
@@ -934,7 +1010,123 @@ namespace LogisticsPro.UI.ViewModels
         }
 
         // ========================================
-        // COST ESTIMATION METHODS
+        // PAGINATION COMMANDS
+        // ========================================
+        [RelayCommand]
+        private void NextPage()
+        {
+            if (CanGoNext)
+            {
+                CurrentRequestPage++;
+                UpdateRequestsPagination();
+            }
+        }
+
+        [RelayCommand]
+        private void PreviousPage()
+        {
+            if (CanGoPrevious)
+            {
+                CurrentRequestPage--;
+                UpdateRequestsPagination();
+            }
+        }
+
+        // ========================================
+        // PRODUCT MANAGEMENT COMMANDS
+        // ========================================
+        [RelayCommand]
+        private void OpenAddProductDialog()
+        {
+            // Create fresh product instance
+            NewProduct = new Product
+            {
+                Status = "Active",
+                CreatedDate = DateTime.Now
+            };
+
+            // Reset text binding
+            UnitPriceText = "";
+
+            IsAddProductDialogOpen = true;
+        }
+
+        [RelayCommand]
+        private void CloseAddProductDialog()
+        {
+            IsAddProductDialogOpen = false;
+        }
+
+        [RelayCommand]
+        private async Task SubmitAddProductAsync()
+        {
+            if (string.IsNullOrWhiteSpace(NewProduct.Name) ||
+                string.IsNullOrWhiteSpace(NewProduct.SKU) ||
+                string.IsNullOrWhiteSpace(NewProduct.Category) ||
+                string.IsNullOrWhiteSpace(NewProduct.UnitOfMeasure) ||
+                string.IsNullOrWhiteSpace(NewProduct.Supplier) ||
+                !decimal.TryParse(UnitPriceText, out decimal price) ||
+                price <= 0)
+            {
+                Console.WriteLine("Cannot add product: Required fields missing or invalid price");
+                return;
+            }
+
+            await ErrorHandler.TrySafeAsync("AddNewProduct", async () =>
+            {
+                // Set the parsed price
+                NewProduct.UnitPrice = price;
+
+                Console.WriteLine($"Adding new product: {NewProduct.Name} - SKU: {NewProduct.SKU}");
+
+                // Add product using API/service
+                var success = await ProductService.AddProductAsync(NewProduct);
+
+                if (success)
+                {
+                    Console.WriteLine($"Product {NewProduct.Name} added successfully");
+
+                    // Get the updated product list to find the new product's ID
+                    var updatedProducts = await ProductService.GetAllProductsAsync();
+                    var addedProduct = updatedProducts.FirstOrDefault(p => p.SKU == NewProduct.SKU);
+
+                    if (addedProduct != null)
+                    {
+                        // CREATE INVENTORY ITEM with 0 stock for the new product
+                        var newInventoryItem = new InventoryItem
+                        {
+                            ProductId = addedProduct.Id, // Use the ID from the added product
+                            Product = addedProduct, // Use the complete product object
+                            QuantityInStock = 0, // Start with 0 stock
+                            MinimumStockLevel = 10, // Default minimum
+                            MaximumStockLevel = 100, // Default maximum
+                            Location = "NEW-00", // Default location for new items
+                            LastStockUpdate = DateTime.Now, // property name
+                            WarehouseId = 1 // Default warehouse
+                        };
+
+                        // Add to inventory
+                        await InventoryService.AddInventoryItemAsync(newInventoryItem);
+                        Console.WriteLine($"Created inventory item for {addedProduct.Name} with 0 stock");
+                    }
+
+                    // Close dialog
+                    IsAddProductDialogOpen = false;
+
+                    // Reload data to show new product AND inventory item
+                    await LoadDashboardDataAsync();
+
+                    Console.WriteLine("Product and inventory lists refreshed");
+                }
+                else
+                {
+                    Console.WriteLine("Failed to add product");
+                }
+            });
+        }
+
+        // ========================================
+        // COST CALCULATION METHODS
         // ========================================
         partial void OnSelectedProductChanged(Product? value)
         {
@@ -963,57 +1155,31 @@ namespace LogisticsPro.UI.ViewModels
             }
         }
 
-        private string _searchText = "";
-        private bool _isFiltering = false;
-
-        public string SearchText
-        {
-            get => _searchText;
-            set
-            {
-                Console.WriteLine($"SearchText setter called with: '{value}'"); // This line works
+        // ========================================
+        // PROPERTY CHANGE HANDLERS
+        // ========================================
         
-                if (SetProperty(ref _searchText, value) && !_isFiltering)
-                {
-                    _isFiltering = true;
-                    try
-                    {
-                        Console.WriteLine($"About to call FilterInventory with: '{value}'");
-                        FilterInventory();
-                        Console.WriteLine($"FilterInventory completed");
-                    }
-                    finally
-                    {
-                        _isFiltering = false;
-                    }
-                }
-                else
-                {
-                    Console.WriteLine($"FilterInventory NOT called - isFiltering: {_isFiltering}"); // ADD THIS
-                }
-            }
-        }
-
-        [RelayCommand]
-        private void NextPage()
+        // Property change handler for month selection
+        partial void OnSelectedMonthChanged(string value)
         {
-            if (CanGoNext)
-            {
-                CurrentRequestPage++;
-                UpdateRequestsPagination();
-            }
+            Console.WriteLine($"Month changed to: {value}");
+            _ = Task.Run(FilterBySelectedMonthAsync);
         }
 
-        [RelayCommand]
-        private void PreviousPage()
+        // Property change handler for UnitPriceText
+        partial void OnUnitPriceTextChanged(string value)
         {
-            if (CanGoPrevious)
+            // Real-time validation
+            if (decimal.TryParse(value, out decimal price) && price > 0)
             {
-                CurrentRequestPage--;
-                UpdateRequestsPagination();
+                NewProduct.UnitPrice = price;
             }
         }
 
+        // ========================================
+        // UTILITY METHODS
+        // ========================================
+        
         // Update pagination method
         private void UpdateRequestsPagination()
         {
@@ -1044,14 +1210,15 @@ namespace LogisticsPro.UI.ViewModels
 
             foreach (var request in pageItems)
             {
-                PaginatedRequests.Add(request);  // DisplayId already correct (1, 2, 3...)
+                PaginatedRequests.Add(request); // DisplayId already correct (1, 2, 3...)
             }
 
             // Notify pagination button states
             OnPropertyChanged(nameof(CanGoPrevious));
             OnPropertyChanged(nameof(CanGoNext));
 
-            Console.WriteLine($"Pagination updated - Page {CurrentRequestPage}/{TotalRequestPages}, showing {PaginatedRequests.Count} items");
+            Console.WriteLine(
+                $"Pagination updated - Page {CurrentRequestPage}/{TotalRequestPages}, showing {PaginatedRequests.Count} items");
             Console.WriteLine($"   Showing Display IDs: {string.Join(", ", pageItems.Select(r => r.DisplayId))}");
         }
         
@@ -1066,72 +1233,43 @@ namespace LogisticsPro.UI.ViewModels
                 var totalOrders = AllRequests.Count;
                 var approvedOrders = AllRequests.Count(r => r.RequestStatus == "Approved");
                 var pendingOrders = AllRequests.Count(r => r.RequestStatus == "Pending");
-        
+
                 // Update revenue view model with order progress
                 RevenueViewModel.UpdateOrderProgress(totalOrders, approvedOrders, pendingOrders);
-        
-                Console.WriteLine($"Updated revenue progress - Total: {totalOrders}, Approved: {approvedOrders}, Pending: {pendingOrders}");
+
+                Console.WriteLine(
+                    $"Updated revenue progress - Total: {totalOrders}, Approved: {approvedOrders}, Pending: {pendingOrders}");
             }
         }
-        
-        private string _quantityText = "1";
-        public string QuantityText
+
+        // ========================================
+        // REPORTS HELPER METHODS
+        // ========================================
+
+        // Helper methods for reports
+        private string ExtractProductNameFromDescription(string description)
         {
-            get => _quantityText;
-            set
+            if (string.IsNullOrEmpty(description)) return "Unknown Product";
+    
+            // Handle your API description format: "Product Name delivery confirmed"
+            if (description.Contains("delivery confirmed"))
             {
-                if (SetProperty(ref _quantityText, value))
-                {
-                    // Convert to int and update NewRequest.RequestedQuantity
-                    if (int.TryParse(value, out int quantity) && quantity > 0)
-                    {
-                        if (NewRequest != null)
-                        {
-                            NewRequest.RequestedQuantity = quantity;
-                            UpdateCostCalculation();
-                        }
-                    }
-                    else if (string.IsNullOrWhiteSpace(value))
-                    {
-                        // Allow empty for better UX - don't show error immediately
-                        if (NewRequest != null)
-                        {
-                            NewRequest.RequestedQuantity = 1; // Default to 1
-                            UpdateCostCalculation();
-                        }
-                    }
-                }
+                return description.Replace(" delivery confirmed", "").Trim();
             }
+    
+            return description;
         }
-        
-        /// <summary>
-        /// Gets the total quantity of all inventory items (sum of all stock)
-        /// </summary>
-        public int TotalStockQuantity
+
+        private decimal CalculateCostFromProfit(decimal profit)
         {
-            get
-            {
-                if (InventoryItems == null || !InventoryItems.Any())
-                    return 0;
-            
-                return InventoryItems.Sum(item => item.QuantityInStock);
-            }
+            // Assuming 50% profit margin: if profit = $500, then cost = $1000
+            return profit * 2;
         }
-        
-        // <summary>
-        /// Gets the available budget formatted as "901K" style
-        /// </summary>
-        public string AvailableBudgetDisplayK
+
+        private decimal CalculateSellingPriceFromProfit(decimal profit)
         {
-            get
-            {
-                if (RevenueViewModel?.AvailableBudget == null)
-                    return "$0K";
-            
-                var budget = RevenueViewModel.AvailableBudget;
-                var budgetInK = Math.Round(budget / 1000, 0);
-                return $"${budgetInK:F0}K";
-            }
+            // Selling price = cost + profit = (profit * 2) + profit = profit * 3
+            return profit * 3;
         }
     }
 }

@@ -260,106 +260,10 @@ namespace LogisticsPro.UI.Services
             AddProduct(product);
             return true;
         }
-
-        /// <summary>
-        /// Update product via API with fallback
-        /// </summary>
-        public static async Task<bool> UpdateProductAsync(Product product)
-        {
-            if (product == null)
-            {
-                Console.WriteLine("Cannot update null product");
-                return false;
-            }
-
-            Console.WriteLine($"Updating product: {product.Name}");
-
-            try
-            {
-                var apiAvailable = await ApiConfiguration.IsApiAvailableAsync();
-
-                if (apiAvailable)
-                {
-                    var json = JsonSerializer.Serialize(product, ApiConfiguration.JsonOptions);
-                    var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                    var response = await ApiConfiguration.HttpClient.PutAsync($"Products/{product.Id}", content);
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        Console.WriteLine($"Product {product.Name} updated successfully via API");
-                        return true;
-                    }
-                    else
-                    {
-                        Console.WriteLine($"API update product failed: {response.StatusCode}");
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        Console.WriteLine($"Error details: {errorContent}");
-                    }
-                }
-            }
-            catch (TaskCanceledException)
-            {
-                Console.WriteLine("API update product timeout, using mock update");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"API update product error: {ex.Message}");
-            }
-
-            // Fall back to mock update
-            Console.WriteLine("Updating product in mock data");
-            UpdateProduct(product);
-            return true;
-        }
-
-        /// <summary>
-        /// Delete product via API with fallback
-        /// </summary>
-        public static async Task<bool> DeleteProductAsync(int id)
-        {
-            Console.WriteLine($"Deleting product ID: {id}");
-
-            try
-            {
-                var apiAvailable = await ApiConfiguration.IsApiAvailableAsync();
-
-                if (apiAvailable)
-                {
-                    var response = await ApiConfiguration.HttpClient.DeleteAsync($"Products/{id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        Console.WriteLine($"Product {id} deleted successfully via API");
-                        return true;
-                    }
-                    else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                    {
-                        Console.WriteLine($"Product {id} not found for deletion in API");
-                        return false; // Don't fall back for not found
-                    }
-                    else
-                    {
-                        Console.WriteLine($"API delete product failed: {response.StatusCode}");
-                    }
-                }
-            }
-            catch (TaskCanceledException)
-            {
-                Console.WriteLine("API delete product timeout, using mock deletion");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"API delete product error: {ex.Message}");
-            }
-
-            // Fall back to mock deletion
-            Console.WriteLine("Deleting product from mock data");
-            return DeleteProduct(id);
-        }
-
+        
+        
         // ========================================
-        // SYNCHRONOUS WRAPPER METHODS (Backward Compatibility)
+        // SYNCHRONOUS WRAPPER METHODS 
         // ========================================
 
         /// <summary>

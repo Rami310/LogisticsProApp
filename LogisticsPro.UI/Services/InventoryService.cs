@@ -483,9 +483,9 @@ namespace LogisticsPro.UI.Services
             item.LastStockUpdate = DateTime.Now;
 
             MockInventory.Add(item);
-            Console.WriteLine($"✅ Inventory item added to mock data with ID {newId}");
+            Console.WriteLine($"✅ Inventory item for product {item.ProductId} added to mock data with ID {newId}");
         }
-
+        
         /// <summary>
         /// Update inventory item in mock data (fallback)
         /// </summary>
@@ -600,4 +600,6 @@ namespace LogisticsPro.UI.Services
         public string? Supplier { get; set; }
         public string? Status { get; set; }
     }
+    
+    
 }
