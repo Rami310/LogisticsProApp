@@ -2,15 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
 using LogisticsPro.UI.Infrastructure;
 using LogisticsPro.UI.Models;
+using LogisticsPro.UI.Models.Revenue;
 using LogisticsPro.UI.Services;
 using LogisticsPro.UI.ViewModels.Shared;
+using LogisticsPro.UI.Views.Admin.Sections;
 using LogisticsPro.UI.Views.Warehouse.WarehouseManager.Sections;
+using ReportsSection = LogisticsPro.UI.Views.Warehouse.WarehouseManager.Sections.ReportsSection;
 
 namespace LogisticsPro.UI.ViewModels
 {
@@ -44,10 +50,29 @@ namespace LogisticsPro.UI.ViewModels
         private List<InventoryItem> _allInventoryItems = new List<InventoryItem>();
         
         public string WelcomeMessage => $"Welcome to Warehouse Dashboard, {Username}!";
+        
+        [ObservableProperty] private decimal _totalProfitThisMonth;
+        [ObservableProperty] private decimal _totalProfitLastMonth;
+        [ObservableProperty] private int _totalSalesThisMonth;
+        [ObservableProperty] private int _totalSalesLastMonth;
+        [ObservableProperty] private decimal _averageProfitPerSale;
+        [ObservableProperty] private ObservableCollection<SalesReportItem> _recentSales = new();
+        [ObservableProperty] private string _selectedMonth = "Current Month";
+        [ObservableProperty] private ObservableCollection<string> _availableMonths = new();
 
+        // Filtered data properties
+        [ObservableProperty] private decimal _filteredProfit;
+        [ObservableProperty] private int _filteredSales;
+        [ObservableProperty] private decimal _filteredAveragePerSale;
+        [ObservableProperty] private ObservableCollection<SalesReportItem> _filteredRecentSales = new();
+
+        private readonly IChartService _chartService;
+        [ObservableProperty] private ISeries[] _profitChartSeries;
+        [ObservableProperty] private Axis[] _profitChartXAxes;
+        [ObservableProperty] private Axis[] _profitChartYAxes;
 
         // ========================================
-        // NEW PROPERTIES FOR PRODUCT REQUESTS SECTION
+        // PROPERTIES FOR PRODUCT REQUESTS SECTION
         // ========================================
         [ObservableProperty] private ObservableCollection<ProductRequest> _allRequests;
 
@@ -75,6 +100,371 @@ namespace LogisticsPro.UI.ViewModels
         {
             SearchText = "";
         }
+        
+        /// <summary>
+        /// Initialize chart properties using the chart service
+        /// </summary>
+        private void InitializeChartPropertiesUsingService()
+        {
+            var (series, xAxes, yAxes) = _chartService.InitializeDefaultChart();
+            ProfitChartSeries = series;
+            ProfitChartXAxes = xAxes;
+            ProfitChartYAxes = yAxes;
+    
+            Console.WriteLine("Chart properties initialized using service");
+        }
+        
+        private async Task LoadBasicReportsDataAsync()
+        {
+            Console.WriteLine("Loading basic reports data...");
+    
+            try
+            {
+                // Get statistics from our method
+                var statistics = await RevenueService.GetRevenueStatisticsAsync();
+        
+                // Update UI on main thread
+                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    TotalProfitThisMonth = statistics.CurrentMonthProfit;
+                    TotalProfitLastMonth = statistics.LastMonthProfit;
+                    TotalSalesThisMonth = statistics.CurrentMonthTransactions;
+                    TotalSalesLastMonth = statistics.LastMonthTransactions;
+            
+                    // Calculate average
+                    AverageProfitPerSale = TotalSalesThisMonth > 0 ? 
+                        TotalProfitThisMonth / TotalSalesThisMonth : 0;
+            
+                    Console.WriteLine($"Basic reports loaded - Profit: ${TotalProfitThisMonth:F2}, Sales: {TotalSalesThisMonth}");
+                });
+        
+                // Also load recent sales
+                await LoadRecentSalesAsync();
+                
+                await LoadAvailableMonthsAsync();
+        
+                await FilterBySelectedMonthAsync();
+                
+                await PrepareMonthlyProfitChartAsync();
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to load basic reports: {ex.Message}");
+            }
+        }
+        
+        private async Task LoadRecentSalesAsync()
+        {
+            Console.WriteLine("Loading recent sales from API...");
+    
+            try
+            {
+                // Get transactions from your API
+                var response = await ApiConfiguration.HttpClient.GetAsync("Revenue/transactions");
+        
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseJson = await response.Content.ReadAsStringAsync();
+                    var transactions = JsonSerializer.Deserialize<List<RevenueTransactionDto>>(responseJson, ApiConfiguration.JsonOptions);
+            
+                    if (transactions != null)
+                    {
+                        // Filter to DELIVERY_CONFIRMED (actual sales) and take recent ones
+                        var salesTransactions = transactions
+                            .Where(t => t.TransactionType == "DELIVERY_CONFIRMED" && t.Amount > 0)
+                            .OrderByDescending(t => t.CreatedDate)
+                            .Take(10) // Show last 10 sales
+                            .Select(t => new SalesReportItem
+                            {
+                                Id = t.ProductRequestId ?? 0,
+                                ProductName = ExtractProductNameFromDescription(t.Description),
+                                Quantity = 1, // Default since we don't have quantity in transaction
+                                Cost = CalculateCostFromProfit(t.Amount), // Cost = profit * 2
+                                SellingPrice = CalculateSellingPriceFromProfit(t.Amount), // Selling = profit * 3
+                                Profit = t.Amount,
+                                SaleDate = t.CreatedDate,
+                                SoldBy = t.CreatedBy
+                            })
+                            .ToList();
+
+                        // Update UI
+                        await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                        {
+                            RecentSales.Clear();
+                            foreach (var sale in salesTransactions)
+                            {
+                                RecentSales.Add(sale);
+                            }
+                    
+                            Console.WriteLine($"Loaded {RecentSales.Count} recent sales");
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading recent sales: {ex.Message}");
+        
+                // Fallback: Add some mock data to show the table structure
+                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    RecentSales.Clear();
+                    RecentSales.Add(new SalesReportItem
+                    {
+                        Id = 1,
+                        ProductName = "Sample Product",
+                        Quantity = 1,
+                        Cost = 1000,
+                        SellingPrice = 1500,
+                        Profit = 500,
+                        SaleDate = DateTime.Now.AddDays(-1),
+                        SoldBy = "warehouse_mgr"
+                    });
+                });
+            }
+        }
+        
+        /// <summary>
+        /// Load available months from your transaction data
+        /// </summary>
+        private async Task LoadAvailableMonthsAsync()
+        {
+            Console.WriteLine("Loading available months...");
+    
+            try
+            {
+                // Get transactions from your API
+                var response = await ApiConfiguration.HttpClient.GetAsync("Revenue/transactions");
+        
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseJson = await response.Content.ReadAsStringAsync();
+                    var transactions = JsonSerializer.Deserialize<List<RevenueTransactionDto>>(responseJson, ApiConfiguration.JsonOptions);
+            
+                    if (transactions != null)
+                    {
+                        // Get unique months from DELIVERY_CONFIRMED transactions
+                        var availableMonths = transactions
+                            .Where(t => t.TransactionType == "DELIVERY_CONFIRMED" && t.Amount > 0)
+                            .Select(t => t.CreatedDate.ToString("MMMM yyyy"))
+                            .Distinct()
+                            .OrderByDescending(m => DateTime.ParseExact(m, "MMMM yyyy", null))
+                            .ToList();
+
+                        // Update UI
+                        await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                        {
+                            AvailableMonths.Clear();
+                            AvailableMonths.Add("All Time"); // Show all data
+                            AvailableMonths.Add("Current Month"); // Current month filter
+                    
+                            foreach (var month in availableMonths)
+                            {
+                                if (!AvailableMonths.Contains(month))
+                                {
+                                    AvailableMonths.Add(month);
+                                }
+                            }
+                    
+                            Console.WriteLine($"Loaded {AvailableMonths.Count} available months: {string.Join(", ", AvailableMonths)}");
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading available months: {ex.Message}");
+        
+                // Fallback: Just add current month
+                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    AvailableMonths.Clear();
+                    AvailableMonths.Add("All Time");
+                    AvailableMonths.Add("Current Month");
+                });
+            }
+        }
+
+        /// <summary>
+        /// Filter data by selected month
+        /// </summary>
+        private async Task FilterBySelectedMonthAsync()
+        {
+            Console.WriteLine($"Filtering data for: {SelectedMonth}");
+    
+            try
+            {
+                // Get all transactions
+                var response = await ApiConfiguration.HttpClient.GetAsync("Revenue/transactions");
+        
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseJson = await response.Content.ReadAsStringAsync();
+                    var transactions = JsonSerializer.Deserialize<List<RevenueTransactionDto>>(responseJson, ApiConfiguration.JsonOptions);
+            
+                    if (transactions != null)
+                    {
+                        List<RevenueTransactionDto> filteredTransactions;
+                
+                        // Filter based on selected month
+                        if (SelectedMonth == "All Time")
+                        {
+                            // Show all transactions
+                            filteredTransactions = transactions
+                                .Where(t => t.TransactionType == "DELIVERY_CONFIRMED" && t.Amount > 0)
+                                .ToList();
+                        }
+                        else if (SelectedMonth == "Current Month")
+                        {
+                            // Current month filter
+                            var currentMonth = DateTime.Now.Month;
+                            var currentYear = DateTime.Now.Year;
+                    
+                            filteredTransactions = transactions
+                                .Where(t => t.TransactionType == "DELIVERY_CONFIRMED" && 
+                                           t.Amount > 0 &&
+                                           t.CreatedDate.Month == currentMonth && 
+                                           t.CreatedDate.Year == currentYear)
+                                .ToList();
+                        }
+                        else
+                        {
+                            // Parse selected month (e.g., "August 2025")
+                            try
+                            {
+                                var selectedDate = DateTime.ParseExact(SelectedMonth, "MMMM yyyy", null);
+                        
+                                filteredTransactions = transactions
+                                    .Where(t => t.TransactionType == "DELIVERY_CONFIRMED" && 
+                                               t.Amount > 0 &&
+                                               t.CreatedDate.Month == selectedDate.Month && 
+                                               t.CreatedDate.Year == selectedDate.Year)
+                                    .ToList();
+                            }
+                            catch (Exception)
+                            {
+                                Console.WriteLine($"Could not parse month: {SelectedMonth}, using current month");
+                                // Fallback to current month
+                                var currentMonth = DateTime.Now.Month;
+                                var currentYear = DateTime.Now.Year;
+                        
+                                filteredTransactions = transactions
+                                    .Where(t => t.TransactionType == "DELIVERY_CONFIRMED" && 
+                                               t.Amount > 0 &&
+                                               t.CreatedDate.Month == currentMonth && 
+                                               t.CreatedDate.Year == currentYear)
+                                    .ToList();
+                            }
+                        }
+
+                        // Calculate filtered metrics
+                        var totalProfit = filteredTransactions.Sum(t => t.Amount);
+                        var totalSales = filteredTransactions.Count;
+                        var averagePerSale = totalSales > 0 ? totalProfit / totalSales : 0;
+
+                        // Convert to SalesReportItems for table
+                        var salesItems = filteredTransactions
+                            .OrderByDescending(t => t.CreatedDate)
+                            .Take(10) // Show last 10 transactions
+                            .Select(t => new SalesReportItem
+                            {
+                                Id = t.ProductRequestId ?? 0,
+                                ProductName = ExtractProductNameFromDescription(t.Description),
+                                Quantity = 1,
+                                Cost = CalculateCostFromProfit(t.Amount),
+                                SellingPrice = CalculateSellingPriceFromProfit(t.Amount),
+                                Profit = t.Amount,
+                                SaleDate = t.CreatedDate,
+                                SoldBy = t.CreatedBy
+                            })
+                            .ToList();
+
+                        // Update UI
+                        await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                        {
+                            FilteredProfit = totalProfit;
+                            FilteredSales = totalSales;
+                            FilteredAveragePerSale = averagePerSale;
+                    
+                            FilteredRecentSales.Clear();
+                            foreach (var sale in salesItems)
+                            {
+                                FilteredRecentSales.Add(sale);
+                            }
+                    
+                            Console.WriteLine($"Filtered data loaded - Profit: ${FilteredProfit:F2}, Sales: {FilteredSales}, Average: ${FilteredAveragePerSale:F2}");
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error filtering by month: {ex.Message}");
+            }
+        }
+
+        // Helper methods
+        private string ExtractProductNameFromDescription(string description)
+        {
+            if (string.IsNullOrEmpty(description)) return "Unknown Product";
+    
+            // Handle your API description format: "Product Name delivery confirmed"
+            if (description.Contains("delivery confirmed"))
+            {
+                return description.Replace(" delivery confirmed", "").Trim();
+            }
+    
+            return description;
+        }
+
+        private decimal CalculateCostFromProfit(decimal profit)
+        {
+            // Assuming 50% profit margin: if profit = $500, then cost = $1000
+            return profit * 2;
+        }
+
+        private decimal CalculateSellingPriceFromProfit(decimal profit)
+        {
+            // Selling price = cost + profit = (profit * 2) + profit = profit * 3
+            return profit * 3;
+        }
+
+        /// <summary>
+        /// Prepare chart using the chart service
+        /// </summary>
+        private async Task PrepareMonthlyProfitChartAsync()
+        {
+            Console.WriteLine("Preparing chart using service...");
+
+            try
+            {
+                // Use the service to prepare the chart for warehouse manager role
+                var (series, xAxes, yAxes) = await _chartService.PrepareMonthlyProfitChartForRoleAsync("Warehouse Manager", Username);
+
+                // Update UI on main thread
+                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    ProfitChartSeries = series;
+                    ProfitChartXAxes = xAxes;
+                    ProfitChartYAxes = yAxes;
+
+                    Console.WriteLine("Chart updated using service");
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error preparing chart using service: {ex.Message}");
+            }
+        }
+        
+        // Property change handler for month selection
+        partial void OnSelectedMonthChanged(string value)
+        {
+            Console.WriteLine($"Month changed to: {value}");
+            _ = Task.Run(FilterBySelectedMonthAsync);
+        }
+        
         public bool CanGoPrevious => CurrentRequestPage > 1;
         public bool CanGoNext => CurrentRequestPage < TotalRequestPages;
 
@@ -106,6 +496,15 @@ namespace LogisticsPro.UI.ViewModels
                     };
                     break;
 
+                case "Reports":
+                    CurrentSectionView = new ReportsSection
+                    {
+                        DataContext = this
+                    };
+                    // Load reports data when navigating
+                    _ = Task.Run(LoadBasicReportsDataAsync);
+                    break;
+
                 case "StockTransfers":
                 case "LowStock":
                     CurrentSectionView = new InventoryManagementSection
@@ -129,6 +528,9 @@ namespace LogisticsPro.UI.ViewModels
         public WarehouseManagerDashboardViewModel(Action navigateToLogin, string username)
             : base(navigateToLogin, username, "Warehouse Dashboard")
         {
+            // Store the service
+            _chartService = ServiceLocator.Get<IChartService>();
+            
             // Initialize revenue section
             RevenueViewModel = new BaseRevenueViewModel("Warehouse Manager");
 
@@ -146,6 +548,8 @@ namespace LogisticsPro.UI.ViewModels
                 RequestDate = DateTime.Now,
                 RequestedQuantity = 1
             };
+            
+            InitializeChartPropertiesUsingService();
 
             // Load data
             _ = Task.Run(async () =>
