@@ -107,3 +107,132 @@
         </Border>
     </StackPanel>
 </UserControl>
+
+<!---
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:LogisticsPro.UI.ViewModels"
+             xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+             x:Class="LogisticsPro.UI.Views.Warehouse.WarehouseManager.Sections.ReportsSection"
+             x:DataType="vm:WarehouseManagerDashboardViewModel">
+    
+    <UserControl.Styles>
+        
+        <Style Selector="Border.metric-card">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#E5E7EB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Margin" Value="0,0,15,0"/>
+        </Style>
+        
+        <Style Selector="TextBlock.metric-title">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#64748B"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+        
+        <Style Selector="TextBlock.metric-value">
+            <Setter Property="FontSize" Value="28"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+        
+        <Style Selector="TextBlock.metric-subtitle">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#9CA3AF"/>
+        </Style>
+    </UserControl.Styles>
+
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="25" Spacing="25">
+            
+            <StackPanel>
+                <TextBlock Text="📊 Sales &amp; Profit Reports" FontSize="24" FontWeight="Bold" Foreground="#1E293B"/>
+                <TextBlock Text="Basic profit and sales analysis from API data" FontSize="14" Foreground="#64748B"/>
+            </StackPanel>
+            
+                <Grid ColumnDefinitions="*,*,*,*" Height="100" Margin="20,20,20,30">
+                    <Border Grid.Column="0" Background="#10B981" CornerRadius="10" Margin="0,0,8,0">
+                        <StackPanel Margin="18" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="💰 Available Budget" FontSize="14" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding AvailableBudgetDisplayK, FallbackValue='$1,200K'}" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,6,0,0" HorizontalAlignment="Center"/>
+                            <TextBlock Text="company funds" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Background="#3B82F6" CornerRadius="10" Margin="4,0">
+                        <StackPanel Margin="18" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="📦 Total Stock" FontSize="14" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding TotalStockQuantity, FallbackValue='38,531'}" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,6,0,0" HorizontalAlignment="Center"/>
+                            <TextBlock Text="items in inventory" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Background="#F59E0B" CornerRadius="10" Margin="4,0">
+                        <StackPanel Margin="18" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="⏳ Pending Orders" FontSize="14" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding PendingRequestsCount, FallbackValue='6'}" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,6,0,0" HorizontalAlignment="Center"/>
+                            <TextBlock Text="awaiting approval" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            
+            
+            <Border Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="12" Padding="20">
+                <StackPanel>
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,15">
+                        <TextBlock Grid.Column="0" 
+                                   Text="📈 Monthly Profit Trend (Last 6 Months)" 
+                                   FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
+                        <TextBlock Grid.Column="1" 
+                                   Text="💡 Live Data from API" 
+                                   FontSize="12" Foreground="#059669" 
+                                   VerticalAlignment="Center"
+                                   FontWeight="SemiBold"/>
+                    </Grid>
+                    
+                    <Border Background="#F9FAFB" 
+                            BorderBrush="#E5E7EB" 
+                            BorderThickness="1" 
+                            CornerRadius="8" 
+                            Height="300"
+                            Padding="10">
+                        
+                        <lvc:CartesianChart Series="{Binding ProfitChartSeries}"
+                                            XAxes="{Binding ProfitChartXAxes}"
+                                            YAxes="{Binding ProfitChartYAxes}"
+                                            TooltipPosition="Top"
+                                            Background="White">
+                            
+                            <lvc:CartesianChart.Styles>
+                                <Style Selector="lvc|CartesianChart">
+                                    <Setter Property="Background" Value="White"/>
+                                </Style>
+                            </lvc:CartesianChart.Styles>
+                        </lvc:CartesianChart>
+                    </Border>
+                    
+                    <TextBlock Text="💡 Chart shows profit trends over the last 6 months. Data updates automatically from API transactions." 
+                               FontSize="12" 
+                               Foreground="#64748B" 
+                               Margin="0,10,0,0"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+            
+            <Border Background="#EFF6FF" 
+                    IsVisible="{Binding IsLoading, FallbackValue='false'}"
+                    CornerRadius="8" 
+                    Padding="20">
+                <StackPanel HorizontalAlignment="Center" Spacing="10">
+                    <ProgressBar IsIndeterminate="True" Width="200" Height="4" Foreground="#3B82F6"/>
+                    <TextBlock Text="Loading reports data..." HorizontalAlignment="Center" FontSize="14" Foreground="#1E40AF"/>
+                </StackPanel>
+            </Border>
+                
+        </StackPanel>
+    </ScrollViewer>
+</UserControl> -->

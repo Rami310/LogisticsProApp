@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
 using LogisticsPro.UI.Infrastructure;
 using LogisticsPro.UI.Models;
 using LogisticsPro.UI.Services;
@@ -45,6 +47,12 @@ namespace LogisticsPro.UI.ViewModels
         [ObservableProperty] private ObservableCollection<string> _recentReports;
         [ObservableProperty] private bool _darkMode = false;
         [ObservableProperty] private bool _isLoading;
+        
+        
+        private readonly IChartService _chartService;
+        [ObservableProperty] private ISeries[] _profitChartSeries;
+        [ObservableProperty] private Axis[] _profitChartXAxes;
+        [ObservableProperty] private Axis[] _profitChartYAxes;
         
         public AdminDashboardViewModel(Action navigateToLogin, string username)
             : base(navigateToLogin, username, "Admin Dashboard")
@@ -183,6 +191,32 @@ namespace LogisticsPro.UI.ViewModels
                 Console.WriteLine($"LoadLogisticsStatistics error: {ex.Message}");
             }
         }
+        
+        
+        private async Task PrepareMonthlyProfitChartAsync()
+        {
+            Console.WriteLine("Preparing chart using service...");
+
+            try
+            {
+                // Use the service to prepare the chart for warehouse manager role
+                var (series, xAxes, yAxes) = await _chartService.PrepareMonthlyProfitChartForRoleAsync("Warehouse Manager", Username);
+
+                // Update UI on main thread
+                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    ProfitChartSeries = series;
+                    ProfitChartXAxes = xAxes;
+                    ProfitChartYAxes = yAxes;
+
+                    Console.WriteLine("Chart updated using service");
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error preparing chart using service: {ex.Message}");
+            }
+        }
 
         // ========================================
         // REFRESH DATA COMMAND (same as other managers)
@@ -284,6 +318,8 @@ namespace LogisticsPro.UI.ViewModels
         }
         
     }
+    
+    
 
     // Keep existing RecentActivity classes unchanged...
 }

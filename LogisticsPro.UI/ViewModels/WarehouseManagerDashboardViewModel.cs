@@ -497,7 +497,7 @@ namespace LogisticsPro.UI.ViewModels
                 await LoadRecentSalesAsync();
                 await LoadAvailableMonthsAsync();
                 await FilterBySelectedMonthAsync();
-                await PrepareMonthlyProfitChartAsync();
+                await PrepareMonthlySpendingChartAsync();
 
             }
             catch (Exception ex)
@@ -759,28 +759,40 @@ namespace LogisticsPro.UI.ViewModels
         /// <summary>
         /// Prepare chart using the chart service
         /// </summary>
-        private async Task PrepareMonthlyProfitChartAsync()
+        private async Task PrepareMonthlySpendingChartAsync()
         {
-            Console.WriteLine("Preparing chart using service...");
+            Console.WriteLine("Preparing monthly spending chart from transactions...");
 
             try
             {
-                // Use the service to prepare the chart for warehouse manager role
-                var (series, xAxes, yAxes) = await _chartService.PrepareMonthlyProfitChartForRoleAsync("Warehouse Manager", Username);
-
-                // Update UI on main thread
-                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                // Get all transactions (same as profit chart)
+                var response = await ApiConfiguration.HttpClient.GetAsync("Revenue/transactions");
+        
+                if (response.IsSuccessStatusCode)
                 {
-                    ProfitChartSeries = series;
-                    ProfitChartXAxes = xAxes;
-                    ProfitChartYAxes = yAxes;
+                    var responseJson = await response.Content.ReadAsStringAsync();
+                    var transactions = JsonSerializer.Deserialize<List<RevenueTransactionDto>>(responseJson, ApiConfiguration.JsonOptions);
+            
+                    if (transactions != null)
+                    {
+                        // Create spending chart using chart service
+                        var (series, xAxes, yAxes) = _chartService.CreateSpendingChartFromTransactions(transactions);
+                
+                        // Update UI on main thread
+                        await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                        {
+                            ProfitChartSeries = series;
+                            ProfitChartXAxes = xAxes;
+                            ProfitChartYAxes = yAxes;
 
-                    Console.WriteLine("Chart updated using service");
-                });
+                            Console.WriteLine("Spending chart updated");
+                        });
+                    }
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error preparing chart using service: {ex.Message}");
+                Console.WriteLine($"Error preparing spending chart: {ex.Message}");
             }
         }
 

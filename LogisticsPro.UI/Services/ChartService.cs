@@ -128,6 +128,7 @@ namespace LogisticsPro.UI.Services
             return CreateSampleProfitChart();
         }
         
+
         /// <summary>
         /// Prepare sales volume chart (bar chart)
         /// </summary>
@@ -342,6 +343,77 @@ namespace LogisticsPro.UI.Services
             
             return (series, xAxes, yAxes);
         }
+        
+        /// <summary>
+        /// Create spending chart from transactions (DEDUCT type)
+        /// </summary>
+        public (ISeries[] Series, Axis[] XAxes, Axis[] YAxes) CreateSpendingChartFromTransactions(List<RevenueTransactionDto> transactions)
+        {
+            Console.WriteLine($"💰 Creating spending chart with {transactions.Count} total transactions");
+            
+            var chartData = new List<double>();
+            var monthLabels = new List<string>();
+            
+            for (int i = 5; i >= 0; i--)
+            {
+                var targetDate = DateTime.Now.AddMonths(-i);
+                var monthName = targetDate.ToString("MMM yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                
+                var monthlySpendingTransactions = transactions
+                    .Where(t => t.TransactionType == "ORDER_PLACED" && 
+                               t.Amount > 0 &&
+                               t.CreatedDate.Month == targetDate.Month && 
+                               t.CreatedDate.Year == targetDate.Year)
+                    .ToList();
+                
+                var monthlySpending = monthlySpendingTransactions.Sum(t => (double)t.Amount);
+                
+                chartData.Add(monthlySpending);
+                monthLabels.Add(monthName);
+                
+                Console.WriteLine($"💰 {monthName}: ${monthlySpending:F2} spent (from {monthlySpendingTransactions.Count} deductions)");
+            }
+            
+            var series = new ISeries[]
+            {
+                new LineSeries<double>
+                {
+                    Values = chartData,
+                    Name = "Monthly Spending",
+                    Stroke = new SolidColorPaint(SKColors.Red) { StrokeThickness = 3 },
+                    Fill = new SolidColorPaint(SKColor.Parse("#EF4444").WithAlpha(50)),
+                    GeometryStroke = new SolidColorPaint(SKColors.Red) { StrokeThickness = 3 },
+                    GeometryFill = new SolidColorPaint(SKColors.White),
+                    GeometrySize = 8
+                }
+            };
+            
+            var xAxes = new Axis[]
+            {
+                new Axis
+                {
+                    Labels = monthLabels,
+                    LabelsRotation = 45,
+                    TextSize = 12,
+                    SeparatorsPaint = new SolidColorPaint(SKColor.Parse("#E5E7EB")),
+                    LabelsPaint = new SolidColorPaint(SKColor.Parse("#64748B"))
+                }
+            };
+            
+            var yAxes = new Axis[]
+            {
+                new Axis
+                {
+                    TextSize = 12,
+                    SeparatorsPaint = new SolidColorPaint(SKColor.Parse("#E5E7EB")),
+                    LabelsPaint = new SolidColorPaint(SKColor.Parse("#64748B")),
+                    Labeler = value => $"${value:N0}"
+                }
+            };
+            
+            return (series, xAxes, yAxes);
+        }
+        
         
         private (ISeries[] Series, Axis[] XAxes, Axis[] YAxes) CreateSampleSalesChart()
         {

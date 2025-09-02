@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
+using LogisticsPro.UI.Models.Revenue;
 
 namespace LogisticsPro.UI.Services
 {
@@ -28,5 +29,7 @@ namespace LogisticsPro.UI.Services
         /// Prepare chart for specific user role (filters data appropriately)
         /// </summary>
         Task<(ISeries[] Series, Axis[] XAxes, Axis[] YAxes)> PrepareMonthlyProfitChartForRoleAsync(string userRole, string username = null);
+        
+        (ISeries[] Series, Axis[] XAxes, Axis[] YAxes) CreateSpendingChartFromTransactions(List<RevenueTransactionDto> transactions);
     }
 }

@@ -80,7 +80,7 @@
                 <StackPanel>
                     <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,15">
                         <TextBlock Grid.Column="0" 
-                                   Text="📈 Monthly Profit Trend (Last 6 Months)" 
+                                   Text="💰 Monthly Spending Trends (Last 6 Months)" 
                                    FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
                         <TextBlock Grid.Column="1" 
                                    Text="💡 Live Data from API" 
