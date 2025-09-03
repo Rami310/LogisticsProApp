@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
 using LogisticsPro.UI.Infrastructure;
 using LogisticsPro.UI.Models;
 using LogisticsPro.UI.Services;
@@ -58,7 +60,20 @@ namespace LogisticsPro.UI.ViewModels
 
         [ObservableProperty]
         private ObservableCollection<ProductRequestWithUIId> _shipmentRequestsWithIds;
+        
+        // Chart properties (add these)
+        [ObservableProperty] private ISeries[] _profitChartSeries;
+        [ObservableProperty] private Axis[] _profitChartXAxes;
+        [ObservableProperty] private Axis[] _profitChartYAxes;
 
+        // KPI properties for logistics
+        public string TotalRevenueDisplay => $"${TotalRevenueFromDeliveries:F0}";
+        public int TotalDeliveries => ShipmentRequests?.Count(r => r.RequestStatus == "Sold Out") ?? 0;
+        [ObservableProperty] private decimal _totalRevenueFromDeliveries;
+
+        // Chart service
+        private readonly IChartService _chartService;
+        
         // Only these new shipment-specific properties
         [ObservableProperty] private int _currentShipmentPage = 1;
         [ObservableProperty] private int _totalShipmentPages = 1;
@@ -94,7 +109,14 @@ namespace LogisticsPro.UI.ViewModels
         public LogisticsManagerDashboardViewModel(Action navigateToLogin, string username)
             : base(navigateToLogin, username, "Logistics Manager Dashboard")
         {
+            // Initialize chart service
+            _chartService = ServiceLocator.Get<IChartService>();
+            
             RevenueViewModel = new BaseRevenueViewModel("Logistics Manager");
+            
+            // Initialize chart properties
+            InitializeChartProperties();
+            
             // Initialize collections
             ShipmentRequestsWithIds = new ObservableCollection<ProductRequestWithUIId>();
             ProductRequests = new ObservableCollection<ProductRequest>();
@@ -130,10 +152,16 @@ namespace LogisticsPro.UI.ViewModels
                 "Dashboard" => null, // Shows main dashboard content
                 "Shipments" => new ShipmentsSection { DataContext = this },
                 "InventoryL" => new InventoryLSection { DataContext = this },
-                "Reports" => null, // Shows main dashboard for now
+                "Reports" => new ReportsSection() {DataContext = this},
                 _ => null
             };
-    
+            
+            // Load chart data when navigating to Reports
+            if (section == "Reports")
+            {
+                _ = Task.Run(LoadProfitChartAsync);
+            }
+            
             Console.WriteLine($"Logistics Manager navigated to {section}");
         }
 
@@ -335,7 +363,35 @@ namespace LogisticsPro.UI.ViewModels
                 Console.WriteLine($"Error cancelling ready for shipment: {ex.Message}");
             }
         }
-
+        
+        private void InitializeChartProperties()
+        {
+            var (series, xAxes, yAxes) = _chartService.InitializeDefaultChart();
+            ProfitChartSeries = series;
+            ProfitChartXAxes = xAxes; 
+            ProfitChartYAxes = yAxes;
+        }
+        
+        private async Task LoadProfitChartAsync()
+        {
+            try
+            {
+                // Use profit chart (DELIVERY_CONFIRMED transactions) for logistics
+                var (series, xAxes, yAxes) = await _chartService.PrepareMonthlyProfitChartAsync();
+        
+                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    ProfitChartSeries = series;
+                    ProfitChartXAxes = xAxes;
+                    ProfitChartYAxes = yAxes;
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading profit chart: {ex.Message}");
+            }
+        }
+        
         // ========================================
         // UTILITY COMMANDS
         // ========================================

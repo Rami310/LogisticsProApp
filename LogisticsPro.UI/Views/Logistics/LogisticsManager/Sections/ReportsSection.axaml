@@ -2,8 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:LogisticsPro.UI.ViewModels"
              xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
-             x:Class="LogisticsPro.UI.Views.Warehouse.WarehouseManager.Sections.ReportsSection"
-             x:DataType="vm:WarehouseManagerDashboardViewModel">
+             x:Class="LogisticsPro.UI.Views.Logistics.LogisticsManager.Sections.ReportsSection"
+             x:DataType="vm:LogisticsManagerDashboardViewModel">
     
     <UserControl.Styles>
         <!-- card style -->
@@ -46,30 +46,30 @@
             
             <!-- Simple Metrics Cards Row -->
                 <Grid ColumnDefinitions="*,*,*,*" Height="100" Margin="20,20,20,30">
-                    <!-- Budget Card -->
+                    <!-- Revenue Card -->
                     <Border Grid.Column="0" Background="#10B981" CornerRadius="10" Margin="0,0,8,0">
                         <StackPanel Margin="18" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <TextBlock Text="💰 Available Budget" FontSize="14" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                            <TextBlock Text="{Binding AvailableBudgetDisplayK, FallbackValue='$1,200K'}" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,6,0,0" HorizontalAlignment="Center"/>
-                            <TextBlock Text="company funds" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="💰 Total Revenue" FontSize="14" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding TotalRevenueDisplay, FallbackValue='$5,400'}" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,6,0,0" HorizontalAlignment="Center"/>
+                            <TextBlock Text="from deliveries" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Border>
 
-                    <!-- Stock Card -->
+                    <!-- Successful Deliveries Card -->
                     <Border Grid.Column="1" Background="#3B82F6" CornerRadius="10" Margin="4,0">
                         <StackPanel Margin="18" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <TextBlock Text="📦 Total Stock" FontSize="14" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                            <TextBlock Text="{Binding TotalStockQuantity, FallbackValue='38,531'}" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,6,0,0" HorizontalAlignment="Center"/>
-                            <TextBlock Text="items in inventory" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="🚚 Deliveries Completed" FontSize="14" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding TotalDeliveries, FallbackValue='12'}" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,6,0,0" HorizontalAlignment="Center"/>
+                            <TextBlock Text="successful shipments" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Border>
 
-                    <!-- Pending Card -->
+                    <!-- Ready for Shipment Card -->
                     <Border Grid.Column="2" Background="#F59E0B" CornerRadius="10" Margin="4,0">
                         <StackPanel Margin="18" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <TextBlock Text="⏳ Pending Orders" FontSize="14" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                            <TextBlock Text="{Binding PendingRequestsCount, FallbackValue='6'}" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,6,0,0" HorizontalAlignment="Center"/>
-                            <TextBlock Text="awaiting approval" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="📦 Ready to Ship" FontSize="14" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding ReadyForShipmentRequests, FallbackValue='3'}" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,6,0,0" HorizontalAlignment="Center"/>
+                            <TextBlock Text="items ready" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Border>
                 </Grid>
@@ -80,7 +80,7 @@
                 <StackPanel>
                     <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,15">
                         <TextBlock Grid.Column="0" 
-                                   Text="💰 Monthly Spending Trends (Last 6 Months)" 
+                                   Text="📈 Monthly Profit Trends (Last 6 Months)" 
                                    FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
                         <TextBlock Grid.Column="1" 
                                    Text="💡 Live Data from API" 
@@ -97,7 +97,7 @@
                             Height="300"
                             Padding="10">
                         
-                        <!-- No inline xmlns declaration -->
+                        <!--No inline xmlns declaration -->
                         <lvc:CartesianChart Series="{Binding ProfitChartSeries}"
                                             XAxes="{Binding ProfitChartXAxes}"
                                             YAxes="{Binding ProfitChartYAxes}"
@@ -114,7 +114,7 @@
                     </Border>
                     
                     <!-- Chart Info -->
-                    <TextBlock Text="💡 Chart shows spending trends over the last 6 months." 
+                    <TextBlock Text="💡 Chart shows profit trends over the last 6 months." 
                                FontSize="12" 
                                Foreground="#64748B" 
                                Margin="0,10,0,0"
