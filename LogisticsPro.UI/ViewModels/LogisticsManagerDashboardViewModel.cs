@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -10,6 +11,7 @@ using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
 using LogisticsPro.UI.Infrastructure;
 using LogisticsPro.UI.Models;
+using LogisticsPro.UI.Models.Revenue;
 using LogisticsPro.UI.Services;
 using LogisticsPro.UI.ViewModels.Shared;
 using LogisticsPro.UI.Views.Logistics.LogisticsManager.Sections;
@@ -160,6 +162,7 @@ namespace LogisticsPro.UI.ViewModels
             if (section == "Reports")
             {
                 _ = Task.Run(LoadProfitChartAsync);
+                _ = Task.Run(LoadRevenueDataAsync);
             }
             
             Console.WriteLine($"Logistics Manager navigated to {section}");
@@ -233,6 +236,8 @@ namespace LogisticsPro.UI.ViewModels
                 });
 
                 await LoadShipmentDataAsync();
+                
+                await LoadRevenueDataAsync();
             }
             catch (Exception ex)
             {
@@ -290,6 +295,47 @@ namespace LogisticsPro.UI.ViewModels
             }
         }
 
+        private async Task LoadRevenueDataAsync()
+        {
+            Console.WriteLine("Loading revenue data for KPI cards...");
+    
+            try
+            {
+                // Get all transactions to calculate total revenue
+                var response = await ApiConfiguration.HttpClient.GetAsync("Revenue/transactions");
+        
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseJson = await response.Content.ReadAsStringAsync();
+                    var transactions = JsonSerializer.Deserialize<List<RevenueTransactionDto>>(responseJson, ApiConfiguration.JsonOptions);
+            
+                    if (transactions != null)
+                    {
+                        // Calculate total revenue from DELIVERY_CONFIRMED transactions
+                        var deliveryTransactions = transactions
+                            .Where(t => t.TransactionType == "DELIVERY_CONFIRMED" && t.Amount > 0)
+                            .ToList();
+                
+                        await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                        {
+                            // Update revenue KPIs
+                            TotalRevenueFromDeliveries = deliveryTransactions.Sum(t => t.Amount);
+                    
+                            // Update delivery count (this should match your existing logic)
+                            OnPropertyChanged(nameof(TotalRevenueDisplay));
+                            OnPropertyChanged(nameof(TotalDeliveries));
+                    
+                            Console.WriteLine($"Revenue data loaded - Total: ${TotalRevenueFromDeliveries:F2} from {deliveryTransactions.Count} deliveries");
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading revenue data: {ex.Message}");
+            }
+        }
+        
         // ========================================
         // MARK READY FOR SHIPMENT COMMAND
         // ========================================
