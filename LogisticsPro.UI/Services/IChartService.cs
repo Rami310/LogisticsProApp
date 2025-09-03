@@ -30,6 +30,8 @@ namespace LogisticsPro.UI.Services
         /// </summary>
         Task<(ISeries[] Series, Axis[] XAxes, Axis[] YAxes)> PrepareMonthlyProfitChartForRoleAsync(string userRole, string username = null);
         
+        (ISeries[] Series, Axis[] XAxes, Axis[] YAxes) CreateCleanProfitChart(List<RevenueTransactionDto> transactions);
+        
         (ISeries[] Series, Axis[] XAxes, Axis[] YAxes) CreateSpendingChartFromTransactions(List<RevenueTransactionDto> transactions);
     }
 }

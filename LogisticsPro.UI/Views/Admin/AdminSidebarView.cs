@@ -21,13 +21,6 @@ namespace LogisticsPro.UI.Views.Admin
             dashboardContent.Children.Add(new TextBlock { Text = "🏠", FontSize = 16 });
             dashboardContent.Children.Add(new TextBlock { Text = "Dashboard", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center });
             dashboardButton.Content = dashboardContent;
-
-            // Activity Button
-            var activityButton = new Button { Classes = { "sidebar-button" } };
-            var activityContent = new StackPanel { Orientation = Avalonia.Layout.Orientation.Horizontal, Spacing = 10 };
-            activityContent.Children.Add(new TextBlock { Text = "⚡", FontSize = 16 });
-            activityContent.Children.Add(new TextBlock { Text = "Activity", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center });
-            activityButton.Content = activityContent;
             
             // Reports Button  
             var reportsButton = new Button { Classes = { "sidebar-button" } };
@@ -38,7 +31,6 @@ namespace LogisticsPro.UI.Views.Admin
             
             // Add buttons to menu panel (removed Inventory and Shipments)
             menuPanel.Children.Add(dashboardButton);
-            menuPanel.Children.Add(activityButton);
             menuPanel.Children.Add(reportsButton);
 
             // Set up bindings when DataContext is available
@@ -47,9 +39,6 @@ namespace LogisticsPro.UI.Views.Admin
                 {
                     dashboardButton.Command = viewModel.NavigateToSectionCommand;
                     dashboardButton.CommandParameter = "Dashboard";
-                    
-                    activityButton.Command = viewModel.NavigateToSectionCommand;
-                    activityButton.CommandParameter = "Activity";          
                     
                     reportsButton.Command = viewModel.NavigateToSectionCommand;
                     reportsButton.CommandParameter = "Reports";

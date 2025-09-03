@@ -1,123 +1,12 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:LogisticsPro.UI.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
              x:Class="LogisticsPro.UI.Views.Admin.Sections.ReportsSection"
              x:DataType="vm:AdminDashboardViewModel">
     
-    <StackPanel Margin="20">
-        <TextBlock Text="Reports Dashboard" 
-                   FontSize="24" 
-                   FontWeight="Bold" 
-                   Margin="0,0,0,20"
-                   Foreground="#2C3E50"/>
-        
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-            <ComboBox Width="150" Margin="0,0,10,0" SelectedIndex="{Binding SelectedReportPeriod}">
-                <ComboBoxItem>This Week</ComboBoxItem>
-                <ComboBoxItem>This Month</ComboBoxItem>
-                <ComboBoxItem>This Quarter</ComboBoxItem>
-                <ComboBoxItem>This Year</ComboBoxItem>
-            </ComboBox>
-            
-            <Button Content="Generate Report" 
-                    Command="{Binding GenerateReportCommand}"
-                    Classes="primary-button"
-                    Padding="10,5"/>
-        </StackPanel>
-        
-        <Border Background="#f0f0f0" 
-                CornerRadius="5" 
-                Padding="15" 
-                Margin="0,10,0,20">
-            <StackPanel>
-                <TextBlock Text="Available Reports" 
-                           FontSize="18" 
-                           FontWeight="Bold" 
-                           Margin="0,0,0,15"
-                           Foreground="#2C3E50"/>
-                
-                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto">
-                    <!-- Report 1 -->
-                    <TextBlock Grid.Row="0" Grid.Column="0" 
-                               Text="Delivery Performance Report" 
-                               Margin="0,10"/>
-                    <Button Grid.Row="0" Grid.Column="1" 
-                            Content="View" 
-                            Command="{Binding ViewReportCommand}"
-                            CommandParameter="Delivery Performance Report"
-                            Classes="primary-button"
-                            Padding="10,5"/>
-                    
-                    <!-- Report 2 -->
-                    <TextBlock Grid.Row="1" Grid.Column="0" 
-                               Text="Inventory Status Report" 
-                               Margin="0,10"/>
-                    <Button Grid.Row="1" Grid.Column="1" 
-                            Content="View" 
-                            Command="{Binding ViewReportCommand}"
-                            CommandParameter="Inventory Status Report"
-                            Classes="primary-button"
-                            Padding="10,5"/>
-                    
-                    <!-- Report 3 -->
-                    <TextBlock Grid.Row="2" Grid.Column="0" 
-                               Text="Cost Analysis Report" 
-                               Margin="0,10"/>
-                    <Button Grid.Row="2" Grid.Column="1" 
-                            Content="View" 
-                            Command="{Binding ViewReportCommand}"
-                            CommandParameter="Cost Analysis Report"
-                            Classes="primary-button"
-                            Padding="10,5"/>
-                    
-                    <!-- Report 4 -->
-                    <TextBlock Grid.Row="3" Grid.Column="0" 
-                               Text="Carrier Performance Report" 
-                               Margin="0,10"/>
-                    <Button Grid.Row="3" Grid.Column="1" 
-                            Content="View" 
-                            Command="{Binding ViewReportCommand}"
-                            CommandParameter="Carrier Performance Report"
-                            Classes="primary-button"
-                            Padding="10,5"/>
-                </Grid>
-            </StackPanel>
-        </Border>
-        
-        <TextBlock Text="Recent Reports" 
-                   FontSize="18" 
-                   FontWeight="Bold" 
-                   Margin="0,0,0,10"
-                   Foreground="#2C3E50"/>
-                   
-        <Border Background="#f0f0f0" 
-                CornerRadius="5" 
-                Padding="15">
-            <ListBox Height="150" ItemsSource="{Binding RecentReports}">
-                <ListBox.Items>
-                    <ListBoxItem>Delivery Performance Report - March 2025</ListBoxItem>
-                    <ListBoxItem>Inventory Status Report - February 2025</ListBoxItem>
-                    <ListBoxItem>Cost Analysis Report - Q1 2025</ListBoxItem>
-                    <ListBoxItem>Carrier Performance Report - January 2025</ListBoxItem>
-                </ListBox.Items>
-            </ListBox>
-        </Border>
-    </StackPanel>
-</UserControl>
-
-<!---
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:vm="clr-namespace:LogisticsPro.UI.ViewModels"
-             xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
-             x:Class="LogisticsPro.UI.Views.Warehouse.WarehouseManager.Sections.ReportsSection"
-             x:DataType="vm:WarehouseManagerDashboardViewModel">
-    
     <UserControl.Styles>
-        
+        <!-- Card styles -->
         <Style Selector="Border.metric-card">
             <Setter Property="Background" Value="White"/>
             <Setter Property="BorderBrush" Value="#E5E7EB"/>
@@ -139,90 +28,164 @@
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Margin" Value="0,0,0,4"/>
         </Style>
-        
-        <Style Selector="TextBlock.metric-subtitle">
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="Foreground" Value="#9CA3AF"/>
-        </Style>
     </UserControl.Styles>
 
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="25" Spacing="25">
             
+            <!-- Header -->
             <StackPanel>
-                <TextBlock Text="📊 Sales &amp; Profit Reports" FontSize="24" FontWeight="Bold" Foreground="#1E293B"/>
-                <TextBlock Text="Basic profit and sales analysis from API data" FontSize="14" Foreground="#64748B"/>
+                <TextBlock Text="📊 Admin Financial Overview" FontSize="24" FontWeight="Bold" Foreground="#1E293B"/>
+                <TextBlock Text="Complete spending and profit analysis across all departments" FontSize="14" Foreground="#64748B"/>
             </StackPanel>
             
-                <Grid ColumnDefinitions="*,*,*,*" Height="100" Margin="20,20,20,30">
-                    <Border Grid.Column="0" Background="#10B981" CornerRadius="10" Margin="0,0,8,0">
-                        <StackPanel Margin="18" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <TextBlock Text="💰 Available Budget" FontSize="14" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                            <TextBlock Text="{Binding AvailableBudgetDisplayK, FallbackValue='$1,200K'}" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,6,0,0" HorizontalAlignment="Center"/>
-                            <TextBlock Text="company funds" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </Border>
+            <!-- Summary Cards -->
+            <Grid ColumnDefinitions="1.2*,1.2*,1.2*" Height="100" Margin="20,20,20,30">
+                <!-- Budget Card -->
+                <Border Grid.Column="0" Background="#10B981" CornerRadius="10" Margin="0,0,8,0">
+                    <StackPanel Margin="18" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Text="💰 Available Budget" FontSize="14" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding AvailableBudgetDisplay, FallbackValue='$1,200K'}" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,6,0,0" HorizontalAlignment="Center"/>
+                        <TextBlock Text="company funds" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
 
-                    <Border Grid.Column="1" Background="#3B82F6" CornerRadius="10" Margin="4,0">
-                        <StackPanel Margin="18" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <TextBlock Text="📦 Total Stock" FontSize="14" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                            <TextBlock Text="{Binding TotalStockQuantity, FallbackValue='38,531'}" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,6,0,0" HorizontalAlignment="Center"/>
-                            <TextBlock Text="items in inventory" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </Border>
+                <!-- Total Stock Card -->
+                <Border Grid.Column="1" Background="#3B82F6" CornerRadius="10" Margin="4,0">
+                    <StackPanel Margin="18" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Text="📦 Total Stock" FontSize="14" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding TotalStockQuantity, FallbackValue='38,531'}" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,6,0,0" HorizontalAlignment="Center"/>
+                        <TextBlock Text="items in inventory" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
 
-                    <Border Grid.Column="2" Background="#F59E0B" CornerRadius="10" Margin="4,0">
-                        <StackPanel Margin="18" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <TextBlock Text="⏳ Pending Orders" FontSize="14" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                            <TextBlock Text="{Binding PendingRequestsCount, FallbackValue='6'}" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,6,0,0" HorizontalAlignment="Center"/>
-                            <TextBlock Text="awaiting approval" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </Border>
-                </Grid>
+                <!-- Pending Requests Card -->
+                <Border Grid.Column="2" Background="#F59E0B" CornerRadius="10" Margin="4,0">
+                    <StackPanel Margin="18" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Text="⏳ Pending Orders" FontSize="14" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding PendingRequests, FallbackValue='6'}" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,6,0,0" HorizontalAlignment="Center"/>
+                        <TextBlock Text="awaiting approval" FontSize="10" Foreground="White" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
             
-            
-            <Border Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="12" Padding="20">
-                <StackPanel>
-                    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,15">
-                        <TextBlock Grid.Column="0" 
-                                   Text="📈 Monthly Profit Trend (Last 6 Months)" 
-                                   FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
-                        <TextBlock Grid.Column="1" 
-                                   Text="💡 Live Data from API" 
-                                   FontSize="12" Foreground="#059669" 
-                                   VerticalAlignment="Center"
-                                   FontWeight="SemiBold"/>
-                    </Grid>
-                    
-                    <Border Background="#F9FAFB" 
-                            BorderBrush="#E5E7EB" 
-                            BorderThickness="1" 
-                            CornerRadius="8" 
-                            Height="300"
-                            Padding="10">
+            <!-- Charts Section - Three Charts -->
+            <Grid ColumnDefinitions="*,*,*">
+                
+                <!-- Spending Chart (Warehouse Perspective) -->
+                <Border Grid.Column="0" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="12" Padding="15">
+                    <StackPanel>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+                            <TextBlock Grid.Column="0" 
+                                       Text="💰 Monthly Spending" 
+                                       FontSize="16" FontWeight="Bold" Foreground="#1E293B"/>
+                            <TextBlock Grid.Column="1" 
+                                       Text="Warehouse" 
+                                       FontSize="10" Foreground="#DC2626" 
+                                       VerticalAlignment="Center"
+                                       FontWeight="SemiBold"/>
+                        </Grid>
                         
-                        <lvc:CartesianChart Series="{Binding ProfitChartSeries}"
-                                            XAxes="{Binding ProfitChartXAxes}"
-                                            YAxes="{Binding ProfitChartYAxes}"
-                                            TooltipPosition="Top"
-                                            Background="White">
+                        <Border Background="#F9FAFB" 
+                                BorderBrush="#E5E7EB" 
+                                BorderThickness="1" 
+                                CornerRadius="8" 
+                                Height="250"
+                                Padding="8">
                             
-                            <lvc:CartesianChart.Styles>
-                                <Style Selector="lvc|CartesianChart">
-                                    <Setter Property="Background" Value="White"/>
-                                </Style>
-                            </lvc:CartesianChart.Styles>
-                        </lvc:CartesianChart>
-                    </Border>
-                    
-                    <TextBlock Text="💡 Chart shows profit trends over the last 6 months. Data updates automatically from API transactions." 
-                               FontSize="12" 
-                               Foreground="#64748B" 
-                               Margin="0,10,0,0"
-                               HorizontalAlignment="Center"/>
-                </StackPanel>
-            </Border>
+                            <lvc:CartesianChart Series="{Binding SpendingChartSeries}"
+                                                XAxes="{Binding SpendingChartXAxes}"
+                                                YAxes="{Binding SpendingChartYAxes}"
+                                                TooltipPosition="Top"
+                                                Background="White">
+                            </lvc:CartesianChart>
+                        </Border>
+                        
+                        <TextBlock Text="💡 Company spending on orders" 
+                                   FontSize="10" 
+                                   Foreground="#64748B" 
+                                   Margin="0,8,0,0"
+                                   HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+                
+                <!-- Income Chart (Logistics Perspective) -->
+                <Border Grid.Column="1" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="12" Padding="15">
+                    <StackPanel>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+                            <TextBlock Grid.Column="0" 
+                                       Text="📈 Monthly Income" 
+                                       FontSize="16" FontWeight="Bold" Foreground="#1E293B"/>
+                            <TextBlock Grid.Column="1" 
+                                       Text="Logistics" 
+                                       FontSize="10" Foreground="#059669" 
+                                       VerticalAlignment="Center"
+                                       FontWeight="SemiBold"/>
+                        </Grid>
+                        
+                        <Border Background="#F9FAFB" 
+                                BorderBrush="#E5E7EB" 
+                                BorderThickness="1" 
+                                CornerRadius="8" 
+                                Height="250"
+                                Padding="8">
+                            
+                            <lvc:CartesianChart Series="{Binding IncomeChartSeries}"
+                                                XAxes="{Binding IncomeChartXAxes}"
+                                                YAxes="{Binding IncomeChartYAxes}"
+                                                TooltipPosition="Top"
+                                                Background="White">
+                            </lvc:CartesianChart>
+                        </Border>
+                        
+                        <TextBlock Text="💡 Revenue from deliveries" 
+                                   FontSize="10" 
+                                   Foreground="#64748B" 
+                                   Margin="0,8,0,0"
+                                   HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+                
+                <!-- Overall Profit Chart (Clean Profit) -->
+                <Border Grid.Column="2" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="12" Padding="15">
+                    <StackPanel>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+                            <TextBlock Grid.Column="0" 
+                                       Text="📊 Net Profit Trends" 
+                                       FontSize="16" FontWeight="Bold" Foreground="#1E293B"/>
+                            <TextBlock Grid.Column="1" 
+                                       Text="Overall" 
+                                       FontSize="10" Foreground="#3B82F6" 
+                                       VerticalAlignment="Center"
+                                       FontWeight="SemiBold"/>
+                        </Grid>
+                        
+                        <Border Background="#F9FAFB" 
+                                BorderBrush="#E5E7EB" 
+                                BorderThickness="1" 
+                                CornerRadius="8" 
+                                Height="250"
+                                Padding="8">
+                            
+                            <lvc:CartesianChart Series="{Binding ProfitChartSeries}"
+                                                XAxes="{Binding ProfitChartXAxes}"
+                                                YAxes="{Binding ProfitChartYAxes}"
+                                                TooltipPosition="Top"
+                                                Background="White">
+                            </lvc:CartesianChart>
+                        </Border>
+                        
+                        <TextBlock Text="💡 Overall company profit trends" 
+                                   FontSize="10" 
+                                   Foreground="#64748B" 
+                                   Margin="0,8,0,0"
+                                   HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+                
+            </Grid>
             
+            <!-- Loading Indicator -->
             <Border Background="#EFF6FF" 
                     IsVisible="{Binding IsLoading, FallbackValue='false'}"
                     CornerRadius="8" 
@@ -235,4 +198,4 @@
                 
         </StackPanel>
     </ScrollViewer>
-</UserControl> -->
+</UserControl>

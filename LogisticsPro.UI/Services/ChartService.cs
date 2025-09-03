@@ -345,6 +345,86 @@ namespace LogisticsPro.UI.Services
         }
         
         /// <summary>
+/// Create clean net profit chart (Income - Spending)
+/// </summary>
+public (ISeries[] Series, Axis[] XAxes, Axis[] YAxes) CreateCleanProfitChart(List<RevenueTransactionDto> transactions)
+{
+    Console.WriteLine($"📊 Creating clean net profit chart with {transactions.Count} total transactions");
+    
+    var chartData = new List<double>();
+    var monthLabels = new List<string>();
+    
+    for (int i = 5; i >= 0; i--)
+    {
+        var targetDate = DateTime.Now.AddMonths(-i);
+        var monthName = targetDate.ToString("MMM yyyy", System.Globalization.CultureInfo.InvariantCulture);
+        
+        // Calculate income (DELIVERY_CONFIRMED)
+        var monthlyIncome = transactions
+            .Where(t => t.TransactionType == "DELIVERY_CONFIRMED" && 
+                       t.Amount > 0 &&
+                       t.CreatedDate.Month == targetDate.Month && 
+                       t.CreatedDate.Year == targetDate.Year)
+            .Sum(t => (double)t.Amount);
+        
+        // Calculate spending (ORDER_PLACED)
+        var monthlySpending = transactions
+            .Where(t => t.TransactionType == "ORDER_PLACED" && 
+                       t.Amount > 0 &&
+                       t.CreatedDate.Month == targetDate.Month && 
+                       t.CreatedDate.Year == targetDate.Year)
+            .Sum(t => (double)t.Amount);
+        
+        // Net profit = Income - Spending
+        var netProfit = monthlyIncome - monthlySpending;
+        
+        chartData.Add(netProfit);
+        monthLabels.Add(monthName);
+        
+        Console.WriteLine($"🔵 {monthName}: Income ${monthlyIncome:F2} - Spending ${monthlySpending:F2} = Net ${netProfit:F2}");
+    }
+    
+    var series = new ISeries[]
+    {
+        new LineSeries<double>
+        {
+            Values = chartData,
+            Name = "Net Profit",
+            Stroke = new SolidColorPaint(SKColors.Blue) { StrokeThickness = 3 },
+            Fill = new SolidColorPaint(SKColor.Parse("#3B82F6").WithAlpha(50)),
+            GeometryStroke = new SolidColorPaint(SKColors.Blue) { StrokeThickness = 3 },
+            GeometryFill = new SolidColorPaint(SKColors.White),
+            GeometrySize = 8
+        }
+    };
+    
+    var xAxes = new Axis[]
+    {
+        new Axis
+        {
+            Labels = monthLabels,
+            LabelsRotation = 45,
+            TextSize = 12,
+            SeparatorsPaint = new SolidColorPaint(SKColor.Parse("#E5E7EB")),
+            LabelsPaint = new SolidColorPaint(SKColor.Parse("#64748B"))
+        }
+    };
+    
+    var yAxes = new Axis[]
+    {
+        new Axis
+        {
+            TextSize = 12,
+            SeparatorsPaint = new SolidColorPaint(SKColor.Parse("#E5E7EB")),
+            LabelsPaint = new SolidColorPaint(SKColor.Parse("#64748B")),
+            Labeler = value => $"${value:N0}"
+        }
+    };
+    
+    return (series, xAxes, yAxes);
+}
+        
+        /// <summary>
         /// Create spending chart from transactions (DEDUCT type)
         /// </summary>
         public (ISeries[] Series, Axis[] XAxes, Axis[] YAxes) CreateSpendingChartFromTransactions(List<RevenueTransactionDto> transactions)

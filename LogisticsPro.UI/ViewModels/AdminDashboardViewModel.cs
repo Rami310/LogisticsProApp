@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -9,6 +11,7 @@ using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
 using LogisticsPro.UI.Infrastructure;
 using LogisticsPro.UI.Models;
+using LogisticsPro.UI.Models.Revenue;
 using LogisticsPro.UI.Services;
 using LogisticsPro.UI.ViewModels.Shared;
 using LogisticsPro.UI.Views.Admin.Sections;
@@ -54,11 +57,27 @@ namespace LogisticsPro.UI.ViewModels
         [ObservableProperty] private Axis[] _profitChartXAxes;
         [ObservableProperty] private Axis[] _profitChartYAxes;
         
+        // Income chart properties (for logistics perspective)
+        [ObservableProperty] private ISeries[] _incomeChartSeries;
+        [ObservableProperty] private Axis[] _incomeChartXAxes;
+        [ObservableProperty] private Axis[] _incomeChartYAxes;
+
+        // Spending chart properties (for warehouse perspective) 
+        [ObservableProperty] private ISeries[] _spendingChartSeries;
+        [ObservableProperty] private Axis[] _spendingChartXAxes;
+        [ObservableProperty] private Axis[] _spendingChartYAxes;
+        
         public AdminDashboardViewModel(Action navigateToLogin, string username)
             : base(navigateToLogin, username, "Admin Dashboard")
         {
+            // Initialize chart service
+            _chartService = ServiceLocator.Get<IChartService>();
+            
             // Initialize Revenue ViewModel (same pattern as other managers)
             RevenueViewModel = new BaseRevenueViewModel("Administrator");
+            
+            // Initialize chart properties
+            InitializeChartProperties();
             
             // Initialize mock data
             InitializeData();
@@ -192,6 +211,55 @@ namespace LogisticsPro.UI.ViewModels
             }
         }
         
+        private async Task LoadAllThreeChartsAsync()
+{
+    Console.WriteLine("Loading all three charts for admin dashboard...");
+    
+    try
+    {
+        // Get transactions once and use for all three charts
+        var response = await ApiConfiguration.HttpClient.GetAsync("Revenue/transactions");
+        
+        if (response.IsSuccessStatusCode)
+        {
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var transactions = JsonSerializer.Deserialize<List<RevenueTransactionDto>>(responseJson, ApiConfiguration.JsonOptions);
+            
+            if (transactions != null)
+            {
+                // Create all three charts using chart service
+                var (spendingSeries, spendingXAxes, spendingYAxes) = _chartService.CreateSpendingChartFromTransactions(transactions);
+                var (incomeSeries, incomeXAxes, incomeYAxes) = await _chartService.PrepareMonthlyProfitChartAsync();
+                var (cleanProfitSeries, cleanProfitXAxes, cleanProfitYAxes) = _chartService.CreateCleanProfitChart(transactions);
+                
+                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    // Update spending chart (red - money out)
+                    SpendingChartSeries = spendingSeries;
+                    SpendingChartXAxes = spendingXAxes;
+                    SpendingChartYAxes = spendingYAxes;
+                    
+                    // Update income chart (green - money in)
+                    IncomeChartSeries = incomeSeries;
+                    IncomeChartXAxes = incomeXAxes;
+                    IncomeChartYAxes = incomeYAxes;
+                    
+                    // Update clean profit chart (blue - net result)
+                    ProfitChartSeries = cleanProfitSeries;
+                    ProfitChartXAxes = cleanProfitXAxes;
+                    ProfitChartYAxes = cleanProfitYAxes;
+                    
+                    Console.WriteLine("All three admin charts updated");
+                });
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error loading admin charts: {ex.Message}");
+    }
+}
+
         
         private async Task PrepareMonthlyProfitChartAsync()
         {
@@ -199,8 +267,8 @@ namespace LogisticsPro.UI.ViewModels
 
             try
             {
-                // Use the service to prepare the chart for warehouse manager role
-                var (series, xAxes, yAxes) = await _chartService.PrepareMonthlyProfitChartForRoleAsync("Warehouse Manager", Username);
+                // Use the service to prepare the chart for admin role
+                var (series, xAxes, yAxes) = await _chartService.PrepareMonthlyProfitChartForRoleAsync("Admin", Username);
 
                 // Update UI on main thread
                 await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
@@ -217,7 +285,28 @@ namespace LogisticsPro.UI.ViewModels
                 Console.WriteLine($"Error preparing chart using service: {ex.Message}");
             }
         }
-
+            
+        private void InitializeChartProperties()
+        {
+            // Initialize all three charts with default data
+            var (defaultSeries, defaultXAxes, defaultYAxes) = _chartService.InitializeDefaultChart();
+    
+            // Spending chart (red)
+            SpendingChartSeries = defaultSeries;
+            SpendingChartXAxes = defaultXAxes;
+            SpendingChartYAxes = defaultYAxes;
+    
+            // Income chart (green) 
+            IncomeChartSeries = defaultSeries;
+            IncomeChartXAxes = defaultXAxes;
+            IncomeChartYAxes = defaultYAxes;
+    
+            // Profit chart (blue)
+            ProfitChartSeries = defaultSeries;
+            ProfitChartXAxes = defaultXAxes; 
+            ProfitChartYAxes = defaultYAxes;
+        }
+        
         // ========================================
         // REFRESH DATA COMMAND (same as other managers)
         // ========================================
@@ -270,9 +359,7 @@ namespace LogisticsPro.UI.ViewModels
                     break;
                 case "Reports":
                     CurrentSectionView = new ReportsSection();
-                    break;
-                case "Activity":
-                    CurrentSectionView = new ActivitySection { DataContext = this };
+                    _ = Task.Run(LoadAllThreeChartsAsync);
                     break;
                 default:
                     CurrentSectionView = null;
