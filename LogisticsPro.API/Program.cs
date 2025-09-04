@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 Console.WriteLine("🚀 Starting LogisticsPro API...");
 
-// ✅ STEP 1: Add Entity Framework and MySQL FIRST
+// Add Entity Framework and MySQL 
 builder.Services.AddDbContext<LogisticsDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -38,11 +38,11 @@ builder.Services.AddDbContext<LogisticsDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
 
-// ✅ STEP 2: Add HttpClient BEFORE controllers
+// Add HttpClient BEFORE controllers
 builder.Services.AddHttpClient();
 Console.WriteLine("✅ HttpClient service registered");
 
-// ✅ STEP 3: Add CORS for frontend integration
+// Add CORS for frontend integration
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -53,16 +53,18 @@ builder.Services.AddCors(options =>
     });
 });
 
-// ✅ STEP 4: Add controllers with JSON options
+// Controllers with JSON options (for API endpoints)
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     });
 
-Console.WriteLine("✅ Controllers service registered");
+// MVC support for web dashboard pages
+builder.Services.AddControllersWithViews();
+Console.WriteLine("✅ Controllers and MVC services registered");
 
-// ✅ STEP 5: Add API documentation
+// API documentation
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -78,7 +80,7 @@ Console.WriteLine("✅ All services registered successfully");
 
 var app = builder.Build();
 
-// ✅ STEP 6: Seed the database
+// Seed the database
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<LogisticsDbContext>();
@@ -106,7 +108,7 @@ using (var scope = app.Services.CreateScope())
         
         Console.WriteLine($"📊 Database ready: {userCount} users, {productCount} products, {revenueCount} revenue records");
         
-        // ✅ CRITICAL: Seed revenue data
+        // Seed revenue data
         await DatabaseSeeder.SeedRevenueDataAsync(context);
         
     }
@@ -118,7 +120,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// ✅ STEP 7: Configure the HTTP request pipeline
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -132,14 +134,24 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Add static files support for web dashboard (CSS, JS, images)
+app.UseStaticFiles();
+
 app.UseCors("AllowFrontend");
 app.UseAuthorization();
 
-// ✅ STEP 8: Map controllers
+// Map API controllers (existing /api/* endpoints)
 app.MapControllers();
-Console.WriteLine("✅ Controllers mapped successfully");
 
-// ✅ STEP 9: Health check endpoint with comprehensive testing
+// Map MVC routes for web dashboard pages
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+Console.WriteLine("✅ Controllers and MVC routes mapped successfully");
+
+// Health check endpoint with comprehensive testing
 app.MapGet("/health", async (LogisticsDbContext context) => 
 {
     try 
@@ -179,6 +191,7 @@ Console.WriteLine("🎯 API running: https://localhost:7001");
 Console.WriteLine("❤️  Health check: https://localhost:7001/health");
 Console.WriteLine("💰 Revenue API: https://localhost:7001/api/Revenue/current");
 Console.WriteLine("📋 Product Requests: https://localhost:7001/api/ProductRequests");
+Console.WriteLine("🌐 Web Admin Dashboard: https://localhost:7001/admin");
 Console.WriteLine("=" + new string('=', 50));
 
 app.Run();
