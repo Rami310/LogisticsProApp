@@ -20,6 +20,8 @@ namespace LogisticsPro.UI.Infrastructure
             // Register services
             Register<NavigationService>(null);
             Register<IChartService>(new ChartService());
+            
+            Register<LocalizationService>(LocalizationService.Instance);
         }
         
         /// <summary>

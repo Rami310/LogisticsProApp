@@ -3,8 +3,9 @@
              xmlns:vm="clr-namespace:LogisticsPro.UI.ViewModels"
              xmlns:shared="clr-namespace:LogisticsPro.UI.Views.Shared"
              x:Class="LogisticsPro.UI.Views.Admin.AdminContentView"
-             x:DataType="vm:AdminDashboardViewModel">
-    
+             x:DataType="vm:AdminDashboardViewModel"
+             FlowDirection="{Binding FlowDirection}">
+
     <Grid>
         <!-- MAIN DASHBOARD - Shows when CurrentSectionView is null -->
         <Grid IsVisible="{Binding CurrentSectionView, Converter={x:Static ObjectConverters.IsNull}}"
@@ -25,33 +26,33 @@
 
             <!-- Warehouse Statistics THIRD -->
             <StackPanel Grid.Row="2" Margin="20,0,20,20">
-                <TextBlock Text="📦 Warehouse Operations" FontSize="18" FontWeight="Bold" Foreground="#2C3E50" Margin="10,0,0,15"/>
+                <TextBlock Text="{Binding WarehouseOperationsHeaderText, FallbackValue='📦 Warehouse Operations'}" FontSize="18" FontWeight="Bold" Foreground="#2C3E50" Margin="10,0,0,15"/>
                 <Border Background="White" BorderBrush="black" BorderThickness="2" CornerRadius="8" Height="80" Padding="25,0">
                     <Grid ColumnDefinitions="*,*,*,*,*">
                         <!-- Total Stock -->
                         <StackPanel Grid.Column="0" VerticalAlignment="Center">
                             <TextBlock Text="{Binding TotalStockQuantity, FallbackValue='0'}" FontSize="24" FontWeight="Bold" Foreground="#3B82F6" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Total Stock" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding TotalStockText, FallbackValue='Total Stock'}" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
                         </StackPanel>
 
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                             <TextBlock Text="{Binding PendingRequests, FallbackValue='0'}" FontSize="24" FontWeight="Bold" Foreground="#EAB308" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Pending" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding PendingText, FallbackValue='Pending'}" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
                         </StackPanel>
 
                         <StackPanel Grid.Column="2" VerticalAlignment="Center">
                             <TextBlock Text="{Binding LowStockItems, FallbackValue='0'}" FontSize="24" FontWeight="Bold" Foreground="#EF4444" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Low Stock" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding LowStockText, FallbackValue='Low Stock'}" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
                         </StackPanel>
 
                         <StackPanel Grid.Column="3" VerticalAlignment="Center">
                             <TextBlock Text="{Binding ApprovedRequests, FallbackValue='0'}" FontSize="24" FontWeight="Bold" Foreground="#10B981" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Approved" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding ApprovedText, FallbackValue='Approved'}" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
                         </StackPanel>
 
                         <StackPanel Grid.Column="4" VerticalAlignment="Center">
                             <TextBlock Text="{Binding AvailableBudgetDisplay, FallbackValue='$0'}" FontSize="24" FontWeight="Bold" Foreground="#8B5CF6" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Available" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding AvailableText, FallbackValue='Available'}" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -59,27 +60,27 @@
 
             <!-- Logistics Statistics FOURTH -->
             <StackPanel Grid.Row="3" Margin="20,0,20,20">
-                <TextBlock Text="🚚 Logistics Operations" FontSize="18" FontWeight="Bold" Foreground="#2C3E50" Margin="10,0,0,15"/>
+                <TextBlock Text="{Binding LogisticsOperationsHeaderText, FallbackValue='🚚 Logistics Operations'}" FontSize="18" FontWeight="Bold" Foreground="#2C3E50" Margin="10,0,0,15"/>
                 <Border Background="White" BorderBrush="black" BorderThickness="2" CornerRadius="8" Height="80" Padding="25,0">
                     <Grid ColumnDefinitions="*,*,*">
                         <!-- Total Requests -->
                         <StackPanel Grid.Column="0" VerticalAlignment="Center">
                             <TextBlock Text="{Binding TotalLogisticsRequests}" FontSize="24" FontWeight="Bold" Foreground="#3B82F6" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Total Requests" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding TotalRequestsText, FallbackValue='Total Requests'}" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
                         </StackPanel>
                         <Border Grid.Column="0" Width="2" Background="Black" HorizontalAlignment="Right" Margin="0,15"/>
                         
                         <!-- In Inventory -->
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                             <TextBlock Text="{Binding InInventoryRequests}" FontSize="24" FontWeight="Bold" Foreground="#F59E0B" HorizontalAlignment="Center"/>
-                            <TextBlock Text="In Inventory" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding InInventoryText, FallbackValue='In Inventory'}" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
                         </StackPanel>
                         <Border Grid.Column="1" Width="2" Background="Black" HorizontalAlignment="Right" Margin="0,15"/>
                         
                         <!-- Ready for Shipment -->
                         <StackPanel Grid.Column="2" VerticalAlignment="Center">
                             <TextBlock Text="{Binding ReadyForShipmentRequests}" FontSize="24" FontWeight="Bold" Foreground="#10B981" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Ready for Shipment" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding ReadyForShipmentText, FallbackValue='Ready for Shipment'}" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -87,7 +88,7 @@
 
             <!-- Quick Actions FIFTH -->
             <StackPanel Grid.Row="4" Margin="20,0,20,30">
-                <TextBlock Text="⚡ Quick Actions" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" Margin="10,0,0,15"/>
+                <TextBlock Text="{Binding QuickActionsHeaderText, FallbackValue='⚡ Quick Actions'}" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" Margin="10,0,0,15"/>
                 
                 <Grid ColumnDefinitions="1*,1*">
                     <Border Grid.Column="0" CornerRadius="12" Height="100">
@@ -122,11 +123,11 @@
                                 </Border>
                                 
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="22,0,25,0">
-                                    <TextBlock Text="View System Reports" 
+                                    <TextBlock Text="{Binding ViewSystemReportsText, FallbackValue='View System Reports'}" 
                                                FontSize="18" 
                                                Foreground="White" 
                                                FontWeight="Bold"/>
-                                    <TextBlock Text="Access comprehensive system analytics and reports" 
+                                    <TextBlock Text="{Binding AccessComprehensiveText, FallbackValue='Access comprehensive system analytics and reports'}" 
                                                FontSize="13" 
                                                Foreground="#BFDBFE" 
                                                Margin="0,5,0,0"/>
@@ -143,5 +144,6 @@
                         IsVisible="{Binding CurrentSectionView, Converter={x:Static ObjectConverters.IsNotNull}}"
                         HorizontalContentAlignment="Stretch"
                         VerticalContentAlignment="Stretch" />
+        
     </Grid>
 </UserControl>

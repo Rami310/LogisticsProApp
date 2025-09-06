@@ -33,17 +33,10 @@ namespace LogisticsPro.UI.Views.HR
             departmentsContent.Children.Add(new TextBlock { Text = "Departments", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center });
             departmentsButton.Content = departmentsContent;
 
-            // HR Reports Button
-            var reportsButton = new Button { Classes = { "sidebar-button" } };
-            var reportsContent = new StackPanel { Orientation = Avalonia.Layout.Orientation.Horizontal, Spacing = 10 };
-            reportsContent.Children.Add(new TextBlock { Text = "📊", FontSize = 16 });
-            reportsContent.Children.Add(new TextBlock { Text = "HR Reports", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center });
-            reportsButton.Content = reportsContent;
 
             // Add buttons to menu panel
             menuPanel.Children.Add(employeesButton);
             menuPanel.Children.Add(departmentsButton);
-            menuPanel.Children.Add(reportsButton);
 
             // Set up bindings when DataContext is available
             this.DataContextChanged += (s, e) => {

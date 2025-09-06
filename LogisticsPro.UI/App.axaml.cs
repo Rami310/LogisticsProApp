@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -28,6 +29,8 @@ public partial class App : Application
         {
             ErrorHandler.TrySafe("AppStartup", () =>
             {
+                LoadLanguagePreference();
+
                 // Set global application icon for all windows
                 var iconUri = new Uri("avares://LogisticsPro.UI/Assets/logistics pro text as a logo.jpg");
                 var icon = new WindowIcon(AssetLoader.Open(iconUri));
@@ -61,5 +64,50 @@ public partial class App : Application
     public static NavigationService GetNavigationService()
     {
         return ServiceLocator.Get<NavigationService>();
+    }
+    
+    private string GetAppDataPath()
+    {
+        var appName = "LogisticsPro";
+        string appDataPath;
+        
+        if (OperatingSystem.IsWindows())
+        {
+            appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
+        }
+        else if (OperatingSystem.IsMacOS())
+        {
+            appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
+        }
+        else // Linux and others
+        {
+            var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            appDataPath = Path.Combine(home, $".{appName.ToLower()}");
+        }
+        
+        Directory.CreateDirectory(appDataPath);
+        return appDataPath;
+    }
+    
+    private void LoadLanguagePreference()
+    {
+        try
+        {
+            var appDataPath = GetAppDataPath();
+            var languageFile = Path.Combine(appDataPath, "language.txt");
+        
+            if (File.Exists(languageFile))
+            {
+                var savedLanguage = File.ReadAllText(languageFile).Trim();
+                if (savedLanguage == "he" || savedLanguage == "en")
+                {
+                    LocalizationService.Instance.SetLanguage(savedLanguage);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to load language preference: {ex.Message}");
+        }
     }
 }
