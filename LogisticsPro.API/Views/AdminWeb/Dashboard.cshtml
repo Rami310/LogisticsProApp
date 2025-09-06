@@ -24,6 +24,8 @@
             --warning-color: #F59E0B;
             --danger-color: #EF4444;
             --dark-color: #1E293B;
+            --purple-color: #8B5CF6;
+            --indigo-color: #6366F1;
         }
 
         body {
@@ -50,25 +52,64 @@
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .kpi-card.budget { background: linear-gradient(135deg, #10B981, #059669); }
-        .kpi-card.stock { background: linear-gradient(135deg, #3B82F6, #1E40AF); }
-        .kpi-card.pending { background: linear-gradient(135deg, #F59E0B, #D97706); }
+        /* Revenue KPI Cards */
+        .kpi-card.current-revenue { background: linear-gradient(135deg, #6366F1, #4F46E5); }
+        .kpi-card.available-budget { background: linear-gradient(135deg, #10B981, #059669); }
+        .kpi-card.total-spent { background: linear-gradient(135deg, #EF4444, #DC2626); }
+        
+        /* Operational KPI Cards */
+        .kpi-card.total-stock { background: linear-gradient(135deg, #3B82F6, #1E40AF); }
+        .kpi-card.pending-orders { background: linear-gradient(135deg, #F59E0B, #D97706); }
+        .kpi-card.success-rate { background: linear-gradient(135deg, #8B5CF6, #7C3AED); }
 
         .kpi-card h5 {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             opacity: 0.9;
             margin-bottom: 0.5rem;
+            font-weight: 500;
         }
 
         .kpi-card .value {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 700;
             margin: 0.5rem 0;
+            line-height: 1;
         }
 
         .kpi-card .subtitle {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
+        .kpi-card .trend {
+            font-size: 0.75rem;
+            opacity: 0.9;
+            margin-top: 0.25rem;
+        }
+
+        .trend.up { color: #D1FAE5; }
+        .trend.down { color: #FEE2E2; }
+
+        /* Revenue Overview Section */
+        .revenue-overview {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .revenue-overview h4 {
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .progress-bar-custom {
+            height: 8px;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
         }
 
         .chart-container {
@@ -96,7 +137,7 @@
         .chart-title {
             font-weight: 600;
             font-size: 1rem;
-            color: var(#1E293B);
+            color: var(--dark-color);
             margin: 0;
         }
 
@@ -118,9 +159,10 @@
             margin-top: 1rem;
         }
 
+        /* Responsive adjustments */
         @@media (max-width: 768px) {
             .kpi-card .value {
-                font-size: 2rem;
+                font-size: 1.8rem;
             }
 
             .chart-container {
@@ -128,7 +170,13 @@
             }
 
             .kpi-card h5 {
-                font-size: 0.8rem;
+                font-size: 0.75rem;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .kpi-card .value {
+                font-size: 1.5rem;
             }
         }
 
@@ -148,47 +196,125 @@
     </style>
 </head>
 <body>
+
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-dark mb-4">
     <div class="container-fluid">
-            <span class="navbar-brand h1 mb-0">
-                📊 LogisticsPro Admin Dashboard
-            </span>
-        <div class="text-white">
-            <small>Real-time monitoring from anywhere</small>
+        <span class="navbar-brand h1 mb-0">
+            📊 LogisticsPro Admin Dashboard
+        </span>
+        <div class="text-white d-flex align-items-center gap-3">
+            <span>👤 @ViewBag.AdminUser</span>
+            <a href="/admin/logout" class="btn btn-outline-light btn-sm">Logout</a>
         </div>
     </div>
 </nav>
 
 <div class="container-fluid">
-    <!-- KPI Cards -->
+    
+    <!-- Revenue Overview Section -->
+    <div class="revenue-overview">
+        <h4>💰 Revenue Overview</h4>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="text-muted">Budget Utilization</span>
+                    <span class="fw-bold">@(((Model.TotalSpent / Model.CurrentRevenue) * 100).ToString("F1"))%</span>
+                </div>
+                <div class="progress progress-bar-custom">
+                    <div class="progress-bar bg-danger" style="width: @(((Model.TotalSpent / Model.CurrentRevenue) * 100).ToString("F1"))%"></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="text-muted">Available Budget</span>
+                    <span class="fw-bold">@(((Model.AvailableBudget / Model.CurrentRevenue) * 100).ToString("F1"))%</span>
+                </div>
+                <div class="progress progress-bar-custom">
+                    <div class="progress-bar bg-success" style="width: @(((Model.AvailableBudget / Model.CurrentRevenue) * 100).ToString("F1"))%"></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="text-muted">Operational Efficiency</span>
+                    <span class="fw-bold">87.3%</span>
+                </div>
+                <div class="progress progress-bar-custom">
+                    <div class="progress-bar bg-primary" style="width: 87.3%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue KPI Cards Row -->
     <div class="row mb-4">
         <div class="col-lg-4 col-md-6 mb-3">
-            <div class="card kpi-card budget text-white h-100">
+            <div class="card kpi-card current-revenue text-white h-100">
                 <div class="card-body text-center">
-                    <h5>💰 Available Budget</h5>
-                    <div class="value">@Model.AvailableBudgetDisplay</div>
-                    <div class="subtitle">company funds</div>
+                    <h5>💎 Current Revenue</h5>
+                    <div class="value">@Model.CurrentRevenueDisplay</div>
+                    <div class="subtitle">total company funds</div>
+                    <div class="trend up">↗ +2.3% from last month</div>
                 </div>
             </div>
         </div>
 
         <div class="col-lg-4 col-md-6 mb-3">
-            <div class="card kpi-card stock text-white h-100">
+            <div class="card kpi-card available-budget text-white h-100">
+                <div class="card-body text-center">
+                    <h5>💰 Available Budget</h5>
+                    <div class="value">@Model.AvailableBudgetDisplay</div>
+                    <div class="subtitle">ready to spend</div>
+                    <div class="trend up">↗ @(((Model.AvailableBudget / Model.CurrentRevenue) * 100).ToString("F1"))% of total</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card kpi-card total-spent text-white h-100">
+                <div class="card-body text-center">
+                    <h5>💸 Total Spent</h5>
+                    <div class="value">@Model.TotalSpentDisplay</div>
+                    <div class="subtitle">this period</div>
+                    <div class="trend down">↘ @(((Model.TotalSpent / Model.CurrentRevenue) * 100).ToString("F1"))% of revenue</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Operational KPI Cards Row -->
+    <div class="row mb-4">
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card kpi-card total-stock text-white h-100">
                 <div class="card-body text-center">
                     <h5>📦 Total Stock</h5>
                     <div class="value">@Model.TotalStock.ToString("N0")</div>
                     <div class="subtitle">items in inventory</div>
+                    <div class="trend up">↗ Well stocked</div>
                 </div>
             </div>
         </div>
 
         <div class="col-lg-4 col-md-6 mb-3">
-            <div class="card kpi-card pending text-white h-100">
+            <div class="card kpi-card pending-orders text-white h-100">
                 <div class="card-body text-center">
                     <h5>⏳ Pending Orders</h5>
                     <div class="value">@Model.PendingRequests</div>
                     <div class="subtitle">awaiting approval</div>
+                    <div class="trend @(Model.PendingRequests > 5 ? "down" : "up")">
+                        @(Model.PendingRequests > 5 ? "↘ Needs attention" : "↗ Under control")
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card kpi-card success-rate text-white h-100">
+                <div class="card-body text-center">
+                    <h5>🎯 Success Rate</h5>
+                    <div class="value">94.2%</div>
+                    <div class="subtitle">orders completed</div>
+                    <div class="trend up">↗ Excellent performance</div>
                 </div>
             </div>
         </div>
@@ -201,7 +327,7 @@
             <div class="card chart-card h-100">
                 <div class="chart-header">
                     <h6 class="chart-title">💰 Monthly Spending</h6>
-                    <span class="chart-badge badge-red">Warehouse</span>
+                    <span class="chart-badge badge-red">Expenses</span>
                 </div>
                 <div class="card-body">
                     <div class="chart-container">
@@ -216,7 +342,7 @@
             <div class="card chart-card h-100">
                 <div class="chart-header">
                     <h6 class="chart-title">📈 Monthly Income</h6>
-                    <span class="chart-badge badge-green">Logistics</span>
+                    <span class="chart-badge badge-green">Revenue</span>
                 </div>
                 <div class="card-body">
                     <div class="chart-container">
@@ -231,7 +357,7 @@
             <div class="card chart-card h-100">
                 <div class="chart-header">
                     <h6 class="chart-title">📊 Net Profit</h6>
-                    <span class="chart-badge badge-blue">Overall</span>
+                    <span class="chart-badge badge-blue">Bottom Line</span>
                 </div>
                 <div class="card-body">
                     <div class="chart-container">

@@ -21,8 +21,15 @@ namespace LogisticsPro.API.Controllers
         [HttpGet("dashboard")]
         public async Task<IActionResult> Dashboard()
         {
+            if (!IsAdminLoggedIn())
+                return RedirectToAction("Login");
+            
             try
             {
+                // Get the logged-in user's details
+                var username = HttpContext.Session.GetString("AdminUsername");
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+
                 // Get data directly from database (more efficient than HTTP calls)
                 var revenue = await _context.CompanyRevenue
                     .OrderByDescending(r => r.LastUpdated)
@@ -43,7 +50,10 @@ namespace LogisticsPro.API.Controllers
                     PendingRequests = pendingRequests,
                     LastUpdated = revenue?.LastUpdated ?? DateTime.Now
                 };
-
+                
+                ViewBag.AdminUser = user?.Name + " " + user?.LastName ?? username;
+                ViewBag.AdminRole = user?.Role ?? "Admin";
+        
                 return View(model);
             }
             catch (Exception ex)
@@ -56,6 +66,8 @@ namespace LogisticsPro.API.Controllers
         [HttpGet("charts-data")]
         public async Task<IActionResult> GetChartsData()
         {
+            if (!IsAdminLoggedIn())
+                return Unauthorized();
             try
             {
                 var transactions = await _context.RevenueTransactions
@@ -157,29 +169,49 @@ namespace LogisticsPro.API.Controllers
 
             return new { labels, values = chartData };
         }
-    }
-
-    // Model class for the dashboard
-    public class AdminDashboardModel
-    {
-        public decimal AvailableBudget { get; set; }
-        public decimal CurrentRevenue { get; set; }
-        public decimal TotalSpent { get; set; }
-        public int TotalStock { get; set; }
-        public int PendingRequests { get; set; }
-        public DateTime LastUpdated { get; set; }
-
-        public string AvailableBudgetDisplay => FormatCurrency(AvailableBudget);
-        public string CurrentRevenueDisplay => FormatCurrency(CurrentRevenue);
-        public string TotalSpentDisplay => FormatCurrency(TotalSpent);
-
-        private string FormatCurrency(decimal amount)
+        
+        [HttpGet("login")]
+        public IActionResult Login()
         {
-            return amount >= 1000000 
-                ? $"${amount / 1000000:F1}M"
-                : amount >= 1000
-                ? $"${amount / 1000:F0}K" 
-                : $"${amount:F0}";
+            if (HttpContext.Session.GetString("AdminLoggedIn") == "true")
+                return RedirectToAction("Dashboard");
+            return View();
         }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(string username, string password)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Username == username && 
+                                          u.Status == "Active" && 
+                                          (u.Role == "Admin" || u.Role == "admin" || u.Role == "Administrator"));
+
+            if (user != null && user.Password == password)
+            {
+                HttpContext.Session.SetString("AdminLoggedIn", "true");
+                HttpContext.Session.SetString("AdminUsername", user.Username);
+                HttpContext.Session.SetString("AdminUserId", user.Id.ToString());
+
+                return RedirectToAction("Dashboard");
+            }
+
+            ViewBag.Error = "Invalid credentials or insufficient permissions";
+            return View();
+        }
+
+        [HttpGet("logout")]
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login");
+        }
+
+        private bool IsAdminLoggedIn()
+        {
+            return HttpContext.Session.GetString("AdminLoggedIn") == "true";
+        }
+
     }
+
+    
 }

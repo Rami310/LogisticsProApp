@@ -78,7 +78,9 @@ builder.Services.AddSwaggerGen(c =>
 
 Console.WriteLine("✅ All services registered successfully");
 
+builder.Services.AddSession();
 var app = builder.Build();
+app.UseSession();
 
 // Seed the database
 using (var scope = app.Services.CreateScope())

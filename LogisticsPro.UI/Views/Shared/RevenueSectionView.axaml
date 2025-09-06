@@ -89,7 +89,7 @@
                                FontWeight="Bold" 
                                Foreground="White" 
                                Margin="0,4,0,0"/>
-                    <TextBlock Text="All time spending" 
+                    <TextBlock Text="All time spending (without a profit)" 
                                FontSize="10" 
                                Foreground="#FCA5A5"/>
                 </StackPanel>

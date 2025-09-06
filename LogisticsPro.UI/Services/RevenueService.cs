@@ -24,7 +24,7 @@ namespace LogisticsPro.UI.Services
         /// <summary>
         /// Get current company revenue and available budget
         /// </summary>
-        public static async Task<CompanyRevenueDto> GetCurrentRevenueAsync()  // ✅ FIXED: Return type
+        public static async Task<CompanyRevenueDto> GetCurrentRevenueAsync()
         {
             Console.WriteLine("💰 Loading company revenue...");
 
