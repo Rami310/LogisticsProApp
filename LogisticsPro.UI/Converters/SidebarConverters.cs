@@ -1,3 +1,18 @@
+/*
+ * UI Layout Converters
+ * 
+ * Purpose: Avalonia UI data binding converters for layout and toggle controls
+ * Dependencies: Avalonia.Data.Converters, Avalonia framework
+ * 
+ * Converters:
+ * - BoolToToggleIconConverter - Converts bool to toggle menu icons (hamburger)
+ * - BoolToWidthConverter - Converts bool to width values (250/0 for sidebar)
+ * - BoolToMarginConverter - Converts bool to margin values for layout spacing
+ * 
+ * Features: One-way binding support, sidebar control, responsive layout
+ * Note: BoolToToggleIconConverter currently shows same icon for both states
+ */
+
 using System;
 using System.Globalization;
 using Avalonia.Data.Converters;
