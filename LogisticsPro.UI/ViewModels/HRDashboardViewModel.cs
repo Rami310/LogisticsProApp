@@ -13,7 +13,6 @@ using CommunityToolkit.Mvvm.Input;
 using LogisticsPro.UI.Infrastructure;
 using LogisticsPro.UI.Models;
 using LogisticsPro.UI.Services;
-using LogisticsPro.UI.Views.HR;
 using LogisticsPro.UI.Views.HR.Sections;
 using EditEmployeeWindow = LogisticsPro.UI.Views.HR.Sections.EditEmployeeWindow;
 
@@ -152,27 +151,7 @@ namespace LogisticsPro.UI.ViewModels
                 Console.WriteLine($"Departments collection updated with {Departments.Count} departments");
             }
         }
-
         
-        // Auto-refresh data periodically
-        private void StartAutoRefresh()
-        {
-            var timer = new System.Timers.Timer(30000); // 30 seconds
-            timer.Elapsed += async (sender, e) =>
-            {
-                try
-                {
-                    await LoadEmployeesAsync();
-                    LoadDepartments();
-                    Console.WriteLine("Auto-refreshed employee and department data");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Auto-refresh error: {ex.Message}");
-                }
-            };
-            timer.Start();
-        }
         
         
         private void LoadRoles()
