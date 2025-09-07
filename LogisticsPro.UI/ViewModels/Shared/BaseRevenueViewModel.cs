@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LogisticsPro.UI.Services;
-
+using LogisticsPro.UI.ViewModels;
 namespace LogisticsPro.UI.ViewModels.Shared
 {
-    public partial class BaseRevenueViewModel : ObservableObject
+    public partial class BaseRevenueViewModel : LocalizedViewModelBase
     {
         [ObservableProperty]
         private decimal _currentRevenue;
@@ -52,7 +52,19 @@ namespace LogisticsPro.UI.ViewModels.Shared
 
         [ObservableProperty]
         private string _budgetUtilizationText = "";
-        
+
+        //localization properties
+        [ObservableProperty] private string _financialOverviewText = "";
+        [ObservableProperty] private string _lastUpdatedText = "";
+        [ObservableProperty] private string _availableBudgetText = "";
+        [ObservableProperty] private string _readyToSpendText = "";
+        [ObservableProperty] private string _totalSpentText = "";
+        [ObservableProperty] private string _allTimeSpendingText = "";
+        [ObservableProperty] private string _thisMonthText = "";
+        [ObservableProperty] private string _monthlySpendingText = "";
+        [ObservableProperty] private string _orderProgressText = "";
+        [ObservableProperty] private string _budgetUtilizationDetailsText = "";
+
         // Color properties for progress bars
         partial void OnBudgetUtilizationProgressChanged(double value)
         {
@@ -79,12 +91,40 @@ namespace LogisticsPro.UI.ViewModels.Shared
             _ => "#27AE60"       // Green - High approval rate
         };
         
-        public BaseRevenueViewModel(string userRole)
+        public BaseRevenueViewModel(string userRole): base()
         {
             UserRole = userRole;
+            UpdateLocalizedTexts();
             _ = Task.Run(LoadRevenueDataAsync);
         }
 
+        protected override void OnLanguageChanged(object sender, EventArgs e)
+        {
+            UpdateLocalizedTexts();
+            base.OnLanguageChanged(sender, e);
+        }
+        
+        private void UpdateLocalizedTexts()
+        {
+            FinancialOverviewText = Localize("AdministratorFinancialOverview");
+            LastUpdatedText = LastUpdated != default 
+                ? $"{Localize("LastUpdated")}: {LastUpdated:MMM dd, yyyy HH:mm}"
+                : Localize("LastUpdated");
+            AvailableBudgetText = Localize("AvailableBudget");
+            ReadyToSpendText = Localize("ReadyToSpend");
+            TotalSpentText = Localize("TotalSpent");
+            AllTimeSpendingText = Localize("AllTimeSpending");
+            ThisMonthText = Localize("ThisMonth");
+            MonthlySpendingText = Localize("MonthlySpending");
+            OrderProgressText = $"📋 {Localize("OrderProgress")}";
+            
+            // Update budget utilization text with localization
+            var totalBudget = AvailableBudget + TotalSpent;
+            BudgetUtilizationDetailsText = $"{Localize("Used")} ${TotalSpent:N0} {Localize("Of")} ${totalBudget:N0} {Localize("TotalBudget")}";
+        }
+
+        
+        
         /// <summary>
         /// Load revenue data from API (your original working method)
         /// </summary>
@@ -165,8 +205,8 @@ namespace LogisticsPro.UI.ViewModels.Shared
                 ? Math.Min((double)(TotalSpent / totalBudget * 100), 100)
                 : 0;
         
-            // Update display text
-            BudgetUtilizationText = $"Used ${TotalSpent:N0} of ${totalBudget:N0} total budget";
+            // Update with localized text
+            BudgetUtilizationDetailsText = $"{Localize("Used")} ${TotalSpent:N0} {Localize("Of")} ${totalBudget:N0} {Localize("TotalBudget")}";
     
             Console.WriteLine($"📊 Budget Utilization: ${TotalSpent:N0}/${totalBudget:N0} = {BudgetUtilizationProgress:F1}%");
         }

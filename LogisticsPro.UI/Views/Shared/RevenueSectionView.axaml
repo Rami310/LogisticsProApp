@@ -37,7 +37,7 @@
         <Grid ColumnDefinitions="Auto,*,Auto">
             <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10">
                 <TextBlock Text="💰" FontSize="18"/>
-                <TextBlock Text="{Binding UserRole, StringFormat='\{0\} Financial Overview'}" 
+                <TextBlock Text="{Binding FinancialOverviewText, FallbackValue='Administrator Financial Overview'}" 
                            FontSize="16" 
                            FontWeight="SemiBold" 
                            Foreground="#1E293B"
@@ -45,7 +45,7 @@
             </StackPanel>
             
             <TextBlock Grid.Column="2" 
-                       Text="{Binding LastUpdated, StringFormat='Last updated: \{0:MMM dd, yyyy HH:mm\}', FallbackValue='Last updated: Aug 14, 2025 18:55'}" 
+                       Text="{Binding LastUpdatedText, FallbackValue='Last updated: Aug 14, 2025 18:55'}" 
                        FontSize="11" 
                        Foreground="#64748B" 
                        Margin="0,0,13,0"
@@ -60,7 +60,7 @@
                     Classes="revenue-card"
                     Background="#10B981">
                 <StackPanel Margin="20" VerticalAlignment="Center">
-                    <TextBlock Text="Available Budget" 
+                    <TextBlock Text="{Binding AvailableBudgetText, FallbackValue='Available Budget'}" 
                                FontSize="13" 
                                Foreground="White" 
                                FontWeight="SemiBold"/>
@@ -69,7 +69,7 @@
                                FontWeight="Bold" 
                                Foreground="White" 
                                Margin="0,4,0,0"/>
-                    <TextBlock Text="Ready to spend" 
+                    <TextBlock Text="{Binding ReadyToSpendText, FallbackValue='Ready to spend'}" 
                                FontSize="10" 
                                Foreground="#86EFAC"/>
                 </StackPanel>
@@ -80,7 +80,7 @@
                     Classes="revenue-card"
                     Background="#EF4444">
                 <StackPanel Margin="20" VerticalAlignment="Center">
-                    <TextBlock Text="Total Spent" 
+                    <TextBlock Text="{Binding TotalSpentText, FallbackValue='Total Spent'}" 
                                FontSize="13" 
                                Foreground="White" 
                                FontWeight="SemiBold"/>
@@ -89,7 +89,7 @@
                                FontWeight="Bold" 
                                Foreground="White" 
                                Margin="0,4,0,0"/>
-                    <TextBlock Text="All time spending" 
+                    <TextBlock Text="{Binding AllTimeSpendingText, FallbackValue='All time spending (without a profit)'}" 
                                FontSize="10" 
                                Foreground="#FCA5A5"/>
                 </StackPanel>
@@ -100,7 +100,7 @@
                     Classes="revenue-card"
                     Background="#3B82F6">
                 <StackPanel Margin="20" VerticalAlignment="Center">
-                    <TextBlock Text="This Month" 
+                    <TextBlock Text="{Binding ThisMonthText, FallbackValue='This Month'}" 
                                FontSize="13" 
                                Foreground="White" 
                                FontWeight="SemiBold"/>
@@ -109,7 +109,7 @@
                                FontWeight="Bold" 
                                Foreground="White" 
                                Margin="0,4,0,0"/>
-                    <TextBlock Text="Monthly spending" 
+                    <TextBlock Text="{Binding MonthlySpendingText, FallbackValue='Monthly spending'}" 
                                FontSize="10" 
                                Foreground="#93C5FD"/>
                 </StackPanel>
@@ -130,7 +130,7 @@
                 <StackPanel Spacing="8">
                     <Grid ColumnDefinitions="Auto,*,Auto">
                         <TextBlock Grid.Column="0" 
-                                   Text="📋 Order Progress" 
+                                   Text="{Binding OrderProgressText, FallbackValue='📋 Order Progress'}" 
                                    FontSize="13" 
                                    FontWeight="SemiBold" 
                                    Foreground="#374151"/>
@@ -165,7 +165,7 @@
                 <StackPanel Spacing="8">
                     <Grid ColumnDefinitions="Auto,*,Auto">
                         <TextBlock Grid.Column="0" 
-                                   Text="📊 Budget Utilization" 
+                                   Text="{Binding BudgetUtilizationText, FallbackValue='📊 Budget Utilization'}" 
                                    FontSize="13" 
                                    FontWeight="SemiBold" 
                                    Foreground="#374151"/>
@@ -183,7 +183,7 @@
                                  BorderThickness="1"
                                  Foreground="#8B5CF6"/>
         
-                    <TextBlock Text="{Binding BudgetUtilizationText}" 
+                    <TextBlock Text="{Binding BudgetUtilizationDetailsText}" 
                                FontSize="11" 
                                Foreground="#6B7280"/>
                 </StackPanel>

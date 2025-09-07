@@ -20,6 +20,8 @@ namespace LogisticsPro.UI.Infrastructure
             // Register services
             Register<NavigationService>(null);
             Register<IChartService>(new ChartService());
+            
+            Register<LocalizationService>(LocalizationService.Instance);
         }
         
         /// <summary>
@@ -48,14 +50,5 @@ namespace LogisticsPro.UI.Infrastructure
             return null;
         }
         
-        /// <summary>
-        /// Check if a service is registered
-        /// </summary>
-        /// <typeparam name="T">Service type</typeparam>
-        /// <returns>True if registered</returns>
-        public static bool IsRegistered<T>() where T : class
-        {
-            return _services.ContainsKey(typeof(T));
-        }
     }
 }

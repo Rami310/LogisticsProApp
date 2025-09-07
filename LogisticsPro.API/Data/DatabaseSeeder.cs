@@ -22,8 +22,7 @@ namespace LogisticsPro.API.Data
             SeedProducts(context);
             SeedInventoryItems(context);
             SeedProductRequests(context);
-            SeedClients(context);
-
+            
             Console.WriteLine("Database seeded successfully with new roles!");
         }
 
@@ -159,6 +158,7 @@ namespace LogisticsPro.API.Data
             context.SaveChanges();
             Console.WriteLine($"✅ Seeded {users.Count} users");
         }
+        
 
         private static void SeedWarehouses(LogisticsDbContext context)
         {
@@ -225,24 +225,6 @@ namespace LogisticsPro.API.Data
             context.ProductRequests.AddRange(productRequests);
             context.SaveChanges();
             Console.WriteLine($"✅ Seeded {productRequests.Count} product requests");
-        }
-
-        private static void SeedClients(LogisticsDbContext context)
-        {
-            if (context.Clients.Any()) return;
-            
-            var clients = new List<Client>
-            {
-                new Client { Name = "Acme Corporation", ContactPerson = "John Smith", Email = "jsmith@acme.com", Phone = "555-1234", Address = "123 Main St", City = "Metropolis", Country = "USA", Status = "Active", RegisteredDate = DateTime.Now.AddMonths(-6) },
-                new Client { Name = "Globex Industries", ContactPerson = "Jane Doe", Email = "jane.doe@globex.com", Phone = "555-5678", Address = "456 Tech Blvd", City = "Silicon Valley", Country = "USA", Status = "Active", RegisteredDate = DateTime.Now.AddMonths(-4) },
-                new Client { Name = "Wayne Enterprises", ContactPerson = "Bruce Wayne", Email = "bruce@wayne.com", Phone = "555-9012", Address = "1 Wayne Tower", City = "Gotham", Country = "USA", Status = "Active", RegisteredDate = DateTime.Now.AddMonths(-3) },
-                new Client { Name = "Stark Industries", ContactPerson = "Tony Stark", Email = "tony@stark.com", Phone = "555-3456", Address = "10880 Malibu Point", City = "Malibu", Country = "USA", Status = "Active", RegisteredDate = DateTime.Now.AddMonths(-2) },
-                new Client { Name = "LexCorp", ContactPerson = "Lex Luthor", Email = "lex@lexcorp.com", Phone = "555-7890", Address = "1000 Lexor Ave", City = "Metropolis", Country = "USA", Status = "Active", RegisteredDate = DateTime.Now.AddMonths(-1) }
-            };
-            
-            context.Clients.AddRange(clients);
-            context.SaveChanges();
-            Console.WriteLine($"✅ Seeded {clients.Count} clients");
         }
         
          public static async Task SeedRevenueDataAsync(LogisticsDbContext context)

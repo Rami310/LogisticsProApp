@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LiveChartsCore;
@@ -82,15 +83,9 @@ namespace LogisticsPro.UI.ViewModels
             // Initialize mock data
             InitializeData();
             
-            // Initialize reports data
-            RecentReports = new ObservableCollection<string>
-            {
-                "Delivery Performance Report - March 2025",
-                "Inventory Status Report - February 2025", 
-                "Cost Analysis Report - Q1 2025",
-                "Carrier Performance Report - January 2025"
-            };
-            
+            // Initialize localized texts
+            UpdateLocalizedTexts();
+
             // Load real data immediately (same as other managers)
             _ = Task.Run(async () => 
             {
@@ -403,6 +398,56 @@ namespace LogisticsPro.UI.ViewModels
                 Console.WriteLine($"UpdateAdminOrderProgress error: {ex.Message}");
             }
         }
+        
+        // localization properties
+        [ObservableProperty] private string _totalStockText = "";
+        [ObservableProperty] private string _pendingText = "";
+        [ObservableProperty] private string _lowStockText = "";
+
+        [ObservableProperty] private string _warehouseOperationsText = "";
+        [ObservableProperty] private string _logisticsOperationsText = "";
+        [ObservableProperty] private string _quickActionsText = "";
+        [ObservableProperty] private string _approvedText = "";
+        [ObservableProperty] private string _availableText = "";
+        
+        [ObservableProperty] private string _warehouseOperationsHeaderText = "";
+        [ObservableProperty] private string _logisticsOperationsHeaderText = "";
+        [ObservableProperty] private string _quickActionsHeaderText = "";
+        [ObservableProperty] private string _totalRequestsText = "";
+        [ObservableProperty] private string _inInventoryText = "";
+        [ObservableProperty] private string _readyForShipmentText = "";
+        [ObservableProperty] private string _viewSystemReportsText = "";
+        [ObservableProperty] private string _accessComprehensiveText = "";
+        // Override the language change method
+        protected override void OnLanguageChanged(object sender, EventArgs e)
+        {
+            FlowDirection = _localization.GetFlowDirection();
+            UpdateLocalizedTexts();
+            base.OnLanguageChanged(sender, e);
+        }
+
+        private void UpdateLocalizedTexts()
+        {
+            TotalStockText = Localize("TotalStock");
+            PendingText = Localize("PendingRequests");
+            LowStockText = Localize("LowStock");
+            WarehouseOperationsText = Localize("WarehouseOperations");
+            LogisticsOperationsText = Localize("LogisticsOperations");
+            QuickActionsText = Localize("QuickActions");
+            ApprovedText = Localize("Approved");
+            AvailableText = Localize("Available");
+            WarehouseOperationsHeaderText = $"📦 {Localize("WarehouseOperations")}";
+            LogisticsOperationsHeaderText = $"🚚 {Localize("LogisticsOperations")}";
+            QuickActionsHeaderText = $"⚡ {Localize("QuickActions")}";
+            TotalRequestsText = Localize("TotalRequests");
+            InInventoryText = Localize("InInventory");
+            ReadyForShipmentText = Localize("ReadyForShipment");
+            ViewSystemReportsText = Localize("ViewSystemReports");
+            AccessComprehensiveText = Localize("AccessComprehensive");
+        }
+        
+        [ObservableProperty] private FlowDirection _flowDirection = FlowDirection.LeftToRight;
+
         
     }
     

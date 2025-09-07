@@ -1,0 +1,493 @@
+@model LogisticsPro.API.Controllers.AdminDashboardModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogisticsPro Admin Dashboard</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #3B82F6;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+            --dark-color: #1E293B;
+            --purple-color: #8B5CF6;
+            --indigo-color: #6366F1;
+        }
+
+        body {
+            background-color: #F8FAFC;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .kpi-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Revenue KPI Cards */
+        .kpi-card.current-revenue { background: linear-gradient(135deg, #6366F1, #4F46E5); }
+        .kpi-card.available-budget { background: linear-gradient(135deg, #10B981, #059669); }
+        .kpi-card.total-spent { background: linear-gradient(135deg, #EF4444, #DC2626); }
+        
+        /* Operational KPI Cards */
+        .kpi-card.total-stock { background: linear-gradient(135deg, #3B82F6, #1E40AF); }
+        .kpi-card.pending-orders { background: linear-gradient(135deg, #F59E0B, #D97706); }
+        .kpi-card.success-rate { background: linear-gradient(135deg, #8B5CF6, #7C3AED); }
+
+        .kpi-card h5 {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .kpi-card .value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+            line-height: 1;
+        }
+
+        .kpi-card .subtitle {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
+        .kpi-card .trend {
+            font-size: 0.75rem;
+            opacity: 0.9;
+            margin-top: 0.25rem;
+        }
+
+        .trend.up { color: #D1FAE5; }
+        .trend.down { color: #FEE2E2; }
+
+        /* Revenue Overview Section */
+        .revenue-overview {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .revenue-overview h4 {
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .progress-bar-custom {
+            height: 8px;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        .chart-card {
+            background: white;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .chart-header {
+            background: #F8FAFC;
+            border-bottom: 1px solid #E2E8F0;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--dark-color);
+            margin: 0;
+        }
+
+        .chart-badge {
+            font-size: 0.7rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 10px;
+        }
+
+        .badge-red { background: #FEE2E2; color: #DC2626; }
+        .badge-green { background: #D1FAE5; color: #059669; }
+        .badge-blue { background: #DBEAFE; color: #1E40AF; }
+
+        .last-updated {
+            font-size: 0.8rem;
+            color: #6B7280;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        /* Responsive adjustments */
+        @@media (max-width: 768px) {
+            .kpi-card .value {
+                font-size: 1.8rem;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+
+            .kpi-card h5 {
+                font-size: 0.75rem;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .kpi-card .value {
+                font-size: 1.5rem;
+            }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @@keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark mb-4">
+    <div class="container-fluid">
+        <span class="navbar-brand h1 mb-0">
+            📊 LogisticsPro Admin Dashboard
+        </span>
+        <div class="text-white d-flex align-items-center gap-3">
+            <span>👤 @ViewBag.AdminUser</span>
+            <a href="/admin/logout" class="btn btn-outline-light btn-sm">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    
+    <!-- Revenue Overview Section -->
+    <div class="revenue-overview">
+        <h4>💰 Revenue Overview</h4>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="text-muted">Budget Utilization</span>
+                    <span class="fw-bold">@(((Model.TotalSpent / Model.CurrentRevenue) * 100).ToString("F1"))%</span>
+                </div>
+                <div class="progress progress-bar-custom">
+                    <div class="progress-bar bg-danger" style="width: @(((Model.TotalSpent / Model.CurrentRevenue) * 100).ToString("F1"))%"></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="text-muted">Available Budget</span>
+                    <span class="fw-bold">@(((Model.AvailableBudget / Model.CurrentRevenue) * 100).ToString("F1"))%</span>
+                </div>
+                <div class="progress progress-bar-custom">
+                    <div class="progress-bar bg-success" style="width: @(((Model.AvailableBudget / Model.CurrentRevenue) * 100).ToString("F1"))%"></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="text-muted">Operational Efficiency</span>
+                    <span class="fw-bold">87.3%</span>
+                </div>
+                <div class="progress progress-bar-custom">
+                    <div class="progress-bar bg-primary" style="width: 87.3%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue KPI Cards Row -->
+    <div class="row mb-4">
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card kpi-card current-revenue text-white h-100">
+                <div class="card-body text-center">
+                    <h5>💎 Current Revenue</h5>
+                    <div class="value">@Model.CurrentRevenueDisplay</div>
+                    <div class="subtitle">total company funds</div>
+                    <div class="trend up">↗ +2.3% from last month</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card kpi-card available-budget text-white h-100">
+                <div class="card-body text-center">
+                    <h5>💰 Available Budget</h5>
+                    <div class="value">@Model.AvailableBudgetDisplay</div>
+                    <div class="subtitle">ready to spend</div>
+                    <div class="trend up">↗ @(((Model.AvailableBudget / Model.CurrentRevenue) * 100).ToString("F1"))% of total</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card kpi-card total-spent text-white h-100">
+                <div class="card-body text-center">
+                    <h5>💸 Total Spent</h5>
+                    <div class="value">@Model.TotalSpentDisplay</div>
+                    <div class="subtitle">this period</div>
+                    <div class="trend down">↘ @(((Model.TotalSpent / Model.CurrentRevenue) * 100).ToString("F1"))% of revenue</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Operational KPI Cards Row -->
+    <div class="row mb-4">
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card kpi-card total-stock text-white h-100">
+                <div class="card-body text-center">
+                    <h5>📦 Total Stock</h5>
+                    <div class="value">@Model.TotalStock.ToString("N0")</div>
+                    <div class="subtitle">items in inventory</div>
+                    <div class="trend up">↗ Well stocked</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card kpi-card pending-orders text-white h-100">
+                <div class="card-body text-center">
+                    <h5>⏳ Pending Orders</h5>
+                    <div class="value">@Model.PendingRequests</div>
+                    <div class="subtitle">awaiting approval</div>
+                    <div class="trend @(Model.PendingRequests > 5 ? "down" : "up")">
+                        @(Model.PendingRequests > 5 ? "↘ Needs attention" : "↗ Under control")
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card kpi-card success-rate text-white h-100">
+                <div class="card-body text-center">
+                    <h5>🎯 Success Rate</h5>
+                    <div class="value">94.2%</div>
+                    <div class="subtitle">orders completed</div>
+                    <div class="trend up">↗ Excellent performance</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row">
+        <!-- Spending Chart -->
+        <div class="col-xl-4 col-lg-12 mb-4">
+            <div class="card chart-card h-100">
+                <div class="chart-header">
+                    <h6 class="chart-title">💰 Monthly Spending</h6>
+                    <span class="chart-badge badge-red">Expenses</span>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="spendingChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Income Chart -->
+        <div class="col-xl-4 col-lg-12 mb-4">
+            <div class="card chart-card h-100">
+                <div class="chart-header">
+                    <h6 class="chart-title">📈 Monthly Income</h6>
+                    <span class="chart-badge badge-green">Revenue</span>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="incomeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Net Profit Chart -->
+        <div class="col-xl-4 col-lg-12 mb-4">
+            <div class="card chart-card h-100">
+                <div class="chart-header">
+                    <h6 class="chart-title">📊 Net Profit</h6>
+                    <span class="chart-badge badge-blue">Bottom Line</span>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="profitChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="last-updated">
+        Last updated: @Model.LastUpdated.ToString("MMM dd, yyyy 'at' h:mm tt")
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Chart Logic -->
+<script>
+    // Chart configuration
+    Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+    Chart.defaults.font.size = 12;
+
+    // Load charts data
+    fetch('/admin/charts-data')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Charts data loaded:', data);
+
+            // Create all three charts
+            createChart('spendingChart', data.spendingData, '#EF4444', 'Monthly Spending');
+            createChart('incomeChart', data.incomeData, '#10B981', 'Monthly Income');
+            createChart('profitChart', data.netProfitData, '#3B82F6', 'Net Profit');
+        })
+        .catch(error => {
+            console.error('Error loading charts:', error);
+            showError('Failed to load chart data');
+        });
+
+    function createChart(canvasId, chartData, color, label) {
+        const ctx = document.getElementById(canvasId);
+        if (!ctx) {
+            console.error('Canvas not found:', canvasId);
+            return;
+        }
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: label,
+                    data: chartData.values,
+                    borderColor: color,
+                    backgroundColor: color + '20',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: color,
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        titleColor: '#1E293B',
+                        bodyColor: '#1E293B',
+                        borderColor: color,
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.parsed.y;
+                                return label + ': $' + value.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#F1F5F9'
+                        },
+                        ticks: {
+                            color: '#6B7280',
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#6B7280'
+                        }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            }
+        });
+    }
+
+    function showError(message) {
+        // Simple error display
+        document.querySelectorAll('.chart-container').forEach(container => {
+            container.innerHTML = `<div class="text-center text-muted mt-5">${message}</div>`;
+        });
+    }
+
+    // Auto-refresh every 5 minutes
+    setInterval(() => {
+        location.reload();
+    }, 5 * 60 * 1000);
+</script>
+</body>
+</html>

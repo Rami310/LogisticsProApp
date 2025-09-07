@@ -16,7 +16,6 @@ namespace LogisticsPro.API.Data
         public DbSet<ProductRequest> ProductRequests { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Warehouse> Warehouses { get; set; }
-        public DbSet<Client> Clients { get; set; }
         
         // Revenue system tables
         public DbSet<CompanyRevenue> CompanyRevenue { get; set; }
@@ -130,23 +129,7 @@ namespace LogisticsPro.API.Data
                 entity.Property(e => e.Manager).HasMaxLength(100);
                 entity.Property(e => e.Status).HasMaxLength(20).HasDefaultValue("Active");
             });
-
-            // Configure Client entity
-            modelBuilder.Entity<Client>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
-                entity.Property(e => e.ContactPerson).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.Email).IsRequired().HasMaxLength(255);
-                entity.Property(e => e.Phone).HasMaxLength(20);
-                entity.Property(e => e.Address).HasMaxLength(500);
-                entity.Property(e => e.City).HasMaxLength(100);
-                entity.Property(e => e.Country).HasMaxLength(100);
-                entity.Property(e => e.Status).HasMaxLength(20).HasDefaultValue("Active");
-
-                // Unique constraint on Email
-                entity.HasIndex(e => e.Email).IsUnique();
-            });
+            
             
             // Configure CompanyRevenue entity - FIXED: No NOW() defaults
             modelBuilder.Entity<CompanyRevenue>(entity =>
