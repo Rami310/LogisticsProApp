@@ -1,3 +1,23 @@
+/*
+ * ProductRequestsController.cs
+ * 
+ * Purpose: Manages product requests throughout their lifecycle (create, approve, reject, cancel, receive)
+ * Dependencies: LogisticsDbContext (DB), HttpClient (revenue API calls)
+ * 
+ * Key Endpoints:
+ * - GET /api/ProductRequests - List all requests with product details
+ * - GET /api/ProductRequests/status/{status} - Filter by status
+ * - GET /api/ProductRequests/user/{username} - Filter by user
+ * - POST /api/ProductRequests - Create new request
+ * - PUT /api/ProductRequests/{id}/approve - Approve pending request
+ * - PUT /api/ProductRequests/{id}/reject - Reject pending request
+ * - PUT /api/ProductRequests/{id}/cancel - Cancel request
+ * - PUT /api/ProductRequests/{id}/receive - Mark approved as received
+ * - DELETE /api/ProductRequests/{id} - Delete pending requests only
+ * 
+ * Features: Auto cost calculation, inventory updates, revenue restoration, status validation
+ */
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LogisticsPro.API.Data;

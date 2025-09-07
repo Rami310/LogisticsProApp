@@ -1,3 +1,21 @@
+/*
+ * RevenueController.cs
+ * 
+ * Purpose: Manages company revenue, budget tracking, and financial transactions
+ * Dependencies: LogisticsDbContext (DB access)
+ * 
+ * Key Endpoints:
+ * - GET /api/Revenue/current - Current revenue and budget status
+ * - GET /api/Revenue/monthly-spending - Current vs previous month spending
+ * - POST /api/Revenue/deduct - Deduct amount for orders
+ * - POST /api/Revenue/restore - Restore amount for cancelled/rejected orders
+ * - GET /api/Revenue/transactions - Transaction history
+ * - GET /api/Revenue/statistics - Budget utilization and statistics
+ * - PUT /api/Revenue/adjust - Manual revenue/budget adjustments
+ * 
+ * Features: Budget validation, transaction logging, utilization calculations, audit trail
+ */
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LogisticsPro.API.Data;

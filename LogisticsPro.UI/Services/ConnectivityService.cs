@@ -1,3 +1,17 @@
+/*
+ * ConnectivityService.cs (UI Service)
+ * 
+ * Purpose: Handles API connectivity checks and offline notifications for Avalonia UI
+ * Dependencies: ApiConfiguration (API availability checking), Avalonia UI framework
+ * 
+ * Key Methods:
+ * - CheckAndNotifyConnectionAsync() - Checks API and shows notification if offline
+ * - ShowOfflineNotificationAsync() - Displays modal offline dialog with retry option
+ * 
+ * Features: One-time notification flag, retry functionality, modal dialog with UI thread handling
+ * UI: Custom styled modal with warning icon, retry/continue buttons, keyboard shortcuts
+ */
+
 using System;
 using System.Threading.Tasks;
 using Avalonia;

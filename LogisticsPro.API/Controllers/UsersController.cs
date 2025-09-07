@@ -1,3 +1,21 @@
+/*
+ * UsersController.cs
+ * 
+ * Purpose: User management and authentication for the logistics system
+ * Dependencies: LogisticsDbContext (DB access)
+ * 
+ * Key Endpoints:
+ * - POST /api/Users/login - User authentication
+ * - GET /api/Users - List all users (excludes passwords)
+ * - GET /api/Users/{id} - Get specific user
+ * - POST /api/Users - Create new user
+ * - PUT /api/Users/{id} - Update user information
+ * - DELETE /api/Users/{id} - Delete user
+ * 
+ * Features: Password exclusion in responses, username uniqueness, role-based management
+ * Security Note: Passwords stored in plain text - implement hashing in production
+ */
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LogisticsPro.API.Data;
