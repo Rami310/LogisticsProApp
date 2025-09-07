@@ -301,10 +301,6 @@ namespace LogisticsPro.UI.Services
                 dialog.Show();
             }
         }
-
-        public static void ResetNotificationFlag()
-        {
-            _hasShownOfflineNotification = false;
-        }
+        
     }
 }
